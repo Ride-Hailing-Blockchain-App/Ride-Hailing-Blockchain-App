@@ -1,0 +1,1069 @@
+{
+  "contractName": "RideHailingApp",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract RideHailingAccounts",
+          "name": "rideHailingAccountsAddress",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract RideHailingAccounts\",\"name\":\"rideHailingAccountsAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/RideHailingApp.sol\":\"RideHailingApp\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/RideHailingAccounts.sol\":{\"keccak256\":\"0x4447b8da97f61873e34227e0250209d4e3fed5635a5031c136c9379c45545f98\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://728a2d500682cbbe94f50450e8a5234b825ee042bd421fa5384b7e53f2634343\",\"dweb:/ipfs/Qmc641NYRgHAqqPwBTkft51iBtrK6D63Qt1j76uDPpADRv\"]},\"project:/contracts/RideHailingApp.sol\":{\"keccak256\":\"0x365bec9cea61b5294900df9f9ef500df8f6c3937a4eda1c4aa4ae470c4e14fe9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://361a9f62391786624b76e6273271b0d1c3673ca76eef9f7de2dc619f17f1d1ea\",\"dweb:/ipfs/QmW9td3oJyoVoALgXTa7XM7GGQQrNs2wH8BgtARog4MC8r\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50604051610167380380610167833981810160405281019061003291906100ed565b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505061011a565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b60006100a88261007d565b9050919050565b60006100ba8261009d565b9050919050565b6100ca816100af565b81146100d557600080fd5b50565b6000815190506100e7816100c1565b92915050565b60006020828403121561010357610102610078565b5b6000610111848285016100d8565b91505092915050565b603f806101286000396000f3fe6080604052600080fdfea2646970667358221220cfcb5e0f8d4d9210d4994eb615f7bbb7b6bb9d80f9a38cc378af802fb80541f464736f6c63430008110033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220cfcb5e0f8d4d9210d4994eb615f7bbb7b6bb9d80f9a38cc378af802fb80541f464736f6c63430008110033",
+  "immutableReferences": {},
+  "generatedSources": [
+    {
+      "ast": {
+        "nodeType": "YulBlock",
+        "src": "0:1483:2",
+        "statements": [
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "47:35:2",
+              "statements": [
+                {
+                  "nodeType": "YulAssignment",
+                  "src": "57:19:2",
+                  "value": {
+                    "arguments": [
+                      {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "73:2:2",
+                        "type": "",
+                        "value": "64"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "mload",
+                      "nodeType": "YulIdentifier",
+                      "src": "67:5:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "67:9:2"
+                  },
+                  "variableNames": [
+                    {
+                      "name": "memPtr",
+                      "nodeType": "YulIdentifier",
+                      "src": "57:6:2"
+                    }
+                  ]
+                }
+              ]
+            },
+            "name": "allocate_unbounded",
+            "nodeType": "YulFunctionDefinition",
+            "returnVariables": [
+              {
+                "name": "memPtr",
+                "nodeType": "YulTypedName",
+                "src": "40:6:2",
+                "type": ""
+              }
+            ],
+            "src": "7:75:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "177:28:2",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "194:1:2",
+                        "type": "",
+                        "value": "0"
+                      },
+                      {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "197:1:2",
+                        "type": "",
+                        "value": "0"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "revert",
+                      "nodeType": "YulIdentifier",
+                      "src": "187:6:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "187:12:2"
+                  },
+                  "nodeType": "YulExpressionStatement",
+                  "src": "187:12:2"
+                }
+              ]
+            },
+            "name": "revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b",
+            "nodeType": "YulFunctionDefinition",
+            "src": "88:117:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "300:28:2",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "317:1:2",
+                        "type": "",
+                        "value": "0"
+                      },
+                      {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "320:1:2",
+                        "type": "",
+                        "value": "0"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "revert",
+                      "nodeType": "YulIdentifier",
+                      "src": "310:6:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "310:12:2"
+                  },
+                  "nodeType": "YulExpressionStatement",
+                  "src": "310:12:2"
+                }
+              ]
+            },
+            "name": "revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db",
+            "nodeType": "YulFunctionDefinition",
+            "src": "211:117:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "379:81:2",
+              "statements": [
+                {
+                  "nodeType": "YulAssignment",
+                  "src": "389:65:2",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "value",
+                        "nodeType": "YulIdentifier",
+                        "src": "404:5:2"
+                      },
+                      {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "411:42:2",
+                        "type": "",
+                        "value": "0xffffffffffffffffffffffffffffffffffffffff"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "and",
+                      "nodeType": "YulIdentifier",
+                      "src": "400:3:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "400:54:2"
+                  },
+                  "variableNames": [
+                    {
+                      "name": "cleaned",
+                      "nodeType": "YulIdentifier",
+                      "src": "389:7:2"
+                    }
+                  ]
+                }
+              ]
+            },
+            "name": "cleanup_t_uint160",
+            "nodeType": "YulFunctionDefinition",
+            "parameters": [
+              {
+                "name": "value",
+                "nodeType": "YulTypedName",
+                "src": "361:5:2",
+                "type": ""
+              }
+            ],
+            "returnVariables": [
+              {
+                "name": "cleaned",
+                "nodeType": "YulTypedName",
+                "src": "371:7:2",
+                "type": ""
+              }
+            ],
+            "src": "334:126:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "511:51:2",
+              "statements": [
+                {
+                  "nodeType": "YulAssignment",
+                  "src": "521:35:2",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "value",
+                        "nodeType": "YulIdentifier",
+                        "src": "550:5:2"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "cleanup_t_uint160",
+                      "nodeType": "YulIdentifier",
+                      "src": "532:17:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "532:24:2"
+                  },
+                  "variableNames": [
+                    {
+                      "name": "cleaned",
+                      "nodeType": "YulIdentifier",
+                      "src": "521:7:2"
+                    }
+                  ]
+                }
+              ]
+            },
+            "name": "cleanup_t_address",
+            "nodeType": "YulFunctionDefinition",
+            "parameters": [
+              {
+                "name": "value",
+                "nodeType": "YulTypedName",
+                "src": "493:5:2",
+                "type": ""
+              }
+            ],
+            "returnVariables": [
+              {
+                "name": "cleaned",
+                "nodeType": "YulTypedName",
+                "src": "503:7:2",
+                "type": ""
+              }
+            ],
+            "src": "466:96:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "639:51:2",
+              "statements": [
+                {
+                  "nodeType": "YulAssignment",
+                  "src": "649:35:2",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "value",
+                        "nodeType": "YulIdentifier",
+                        "src": "678:5:2"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "cleanup_t_address",
+                      "nodeType": "YulIdentifier",
+                      "src": "660:17:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "660:24:2"
+                  },
+                  "variableNames": [
+                    {
+                      "name": "cleaned",
+                      "nodeType": "YulIdentifier",
+                      "src": "649:7:2"
+                    }
+                  ]
+                }
+              ]
+            },
+            "name": "cleanup_t_contract$_RideHailingAccounts_$56",
+            "nodeType": "YulFunctionDefinition",
+            "parameters": [
+              {
+                "name": "value",
+                "nodeType": "YulTypedName",
+                "src": "621:5:2",
+                "type": ""
+              }
+            ],
+            "returnVariables": [
+              {
+                "name": "cleaned",
+                "nodeType": "YulTypedName",
+                "src": "631:7:2",
+                "type": ""
+              }
+            ],
+            "src": "568:122:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "765:105:2",
+              "statements": [
+                {
+                  "body": {
+                    "nodeType": "YulBlock",
+                    "src": "848:16:2",
+                    "statements": [
+                      {
+                        "expression": {
+                          "arguments": [
+                            {
+                              "kind": "number",
+                              "nodeType": "YulLiteral",
+                              "src": "857:1:2",
+                              "type": "",
+                              "value": "0"
+                            },
+                            {
+                              "kind": "number",
+                              "nodeType": "YulLiteral",
+                              "src": "860:1:2",
+                              "type": "",
+                              "value": "0"
+                            }
+                          ],
+                          "functionName": {
+                            "name": "revert",
+                            "nodeType": "YulIdentifier",
+                            "src": "850:6:2"
+                          },
+                          "nodeType": "YulFunctionCall",
+                          "src": "850:12:2"
+                        },
+                        "nodeType": "YulExpressionStatement",
+                        "src": "850:12:2"
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "name": "value",
+                            "nodeType": "YulIdentifier",
+                            "src": "788:5:2"
+                          },
+                          {
+                            "arguments": [
+                              {
+                                "name": "value",
+                                "nodeType": "YulIdentifier",
+                                "src": "839:5:2"
+                              }
+                            ],
+                            "functionName": {
+                              "name": "cleanup_t_contract$_RideHailingAccounts_$56",
+                              "nodeType": "YulIdentifier",
+                              "src": "795:43:2"
+                            },
+                            "nodeType": "YulFunctionCall",
+                            "src": "795:50:2"
+                          }
+                        ],
+                        "functionName": {
+                          "name": "eq",
+                          "nodeType": "YulIdentifier",
+                          "src": "785:2:2"
+                        },
+                        "nodeType": "YulFunctionCall",
+                        "src": "785:61:2"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "iszero",
+                      "nodeType": "YulIdentifier",
+                      "src": "778:6:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "778:69:2"
+                  },
+                  "nodeType": "YulIf",
+                  "src": "775:89:2"
+                }
+              ]
+            },
+            "name": "validator_revert_t_contract$_RideHailingAccounts_$56",
+            "nodeType": "YulFunctionDefinition",
+            "parameters": [
+              {
+                "name": "value",
+                "nodeType": "YulTypedName",
+                "src": "758:5:2",
+                "type": ""
+              }
+            ],
+            "src": "696:174:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "965:106:2",
+              "statements": [
+                {
+                  "nodeType": "YulAssignment",
+                  "src": "975:22:2",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "offset",
+                        "nodeType": "YulIdentifier",
+                        "src": "990:6:2"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "mload",
+                      "nodeType": "YulIdentifier",
+                      "src": "984:5:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "984:13:2"
+                  },
+                  "variableNames": [
+                    {
+                      "name": "value",
+                      "nodeType": "YulIdentifier",
+                      "src": "975:5:2"
+                    }
+                  ]
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "name": "value",
+                        "nodeType": "YulIdentifier",
+                        "src": "1059:5:2"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "validator_revert_t_contract$_RideHailingAccounts_$56",
+                      "nodeType": "YulIdentifier",
+                      "src": "1006:52:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "1006:59:2"
+                  },
+                  "nodeType": "YulExpressionStatement",
+                  "src": "1006:59:2"
+                }
+              ]
+            },
+            "name": "abi_decode_t_contract$_RideHailingAccounts_$56_fromMemory",
+            "nodeType": "YulFunctionDefinition",
+            "parameters": [
+              {
+                "name": "offset",
+                "nodeType": "YulTypedName",
+                "src": "943:6:2",
+                "type": ""
+              },
+              {
+                "name": "end",
+                "nodeType": "YulTypedName",
+                "src": "951:3:2",
+                "type": ""
+              }
+            ],
+            "returnVariables": [
+              {
+                "name": "value",
+                "nodeType": "YulTypedName",
+                "src": "959:5:2",
+                "type": ""
+              }
+            ],
+            "src": "876:195:2"
+          },
+          {
+            "body": {
+              "nodeType": "YulBlock",
+              "src": "1180:300:2",
+              "statements": [
+                {
+                  "body": {
+                    "nodeType": "YulBlock",
+                    "src": "1226:83:2",
+                    "statements": [
+                      {
+                        "expression": {
+                          "arguments": [],
+                          "functionName": {
+                            "name": "revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b",
+                            "nodeType": "YulIdentifier",
+                            "src": "1228:77:2"
+                          },
+                          "nodeType": "YulFunctionCall",
+                          "src": "1228:79:2"
+                        },
+                        "nodeType": "YulExpressionStatement",
+                        "src": "1228:79:2"
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "name": "dataEnd",
+                            "nodeType": "YulIdentifier",
+                            "src": "1201:7:2"
+                          },
+                          {
+                            "name": "headStart",
+                            "nodeType": "YulIdentifier",
+                            "src": "1210:9:2"
+                          }
+                        ],
+                        "functionName": {
+                          "name": "sub",
+                          "nodeType": "YulIdentifier",
+                          "src": "1197:3:2"
+                        },
+                        "nodeType": "YulFunctionCall",
+                        "src": "1197:23:2"
+                      },
+                      {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "1222:2:2",
+                        "type": "",
+                        "value": "32"
+                      }
+                    ],
+                    "functionName": {
+                      "name": "slt",
+                      "nodeType": "YulIdentifier",
+                      "src": "1193:3:2"
+                    },
+                    "nodeType": "YulFunctionCall",
+                    "src": "1193:32:2"
+                  },
+                  "nodeType": "YulIf",
+                  "src": "1190:119:2"
+                },
+                {
+                  "nodeType": "YulBlock",
+                  "src": "1319:154:2",
+                  "statements": [
+                    {
+                      "nodeType": "YulVariableDeclaration",
+                      "src": "1334:15:2",
+                      "value": {
+                        "kind": "number",
+                        "nodeType": "YulLiteral",
+                        "src": "1348:1:2",
+                        "type": "",
+                        "value": "0"
+                      },
+                      "variables": [
+                        {
+                          "name": "offset",
+                          "nodeType": "YulTypedName",
+                          "src": "1338:6:2",
+                          "type": ""
+                        }
+                      ]
+                    },
+                    {
+                      "nodeType": "YulAssignment",
+                      "src": "1363:100:2",
+                      "value": {
+                        "arguments": [
+                          {
+                            "arguments": [
+                              {
+                                "name": "headStart",
+                                "nodeType": "YulIdentifier",
+                                "src": "1435:9:2"
+                              },
+                              {
+                                "name": "offset",
+                                "nodeType": "YulIdentifier",
+                                "src": "1446:6:2"
+                              }
+                            ],
+                            "functionName": {
+                              "name": "add",
+                              "nodeType": "YulIdentifier",
+                              "src": "1431:3:2"
+                            },
+                            "nodeType": "YulFunctionCall",
+                            "src": "1431:22:2"
+                          },
+                          {
+                            "name": "dataEnd",
+                            "nodeType": "YulIdentifier",
+                            "src": "1455:7:2"
+                          }
+                        ],
+                        "functionName": {
+                          "name": "abi_decode_t_contract$_RideHailingAccounts_$56_fromMemory",
+                          "nodeType": "YulIdentifier",
+                          "src": "1373:57:2"
+                        },
+                        "nodeType": "YulFunctionCall",
+                        "src": "1373:90:2"
+                      },
+                      "variableNames": [
+                        {
+                          "name": "value0",
+                          "nodeType": "YulIdentifier",
+                          "src": "1363:6:2"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "name": "abi_decode_tuple_t_contract$_RideHailingAccounts_$56_fromMemory",
+            "nodeType": "YulFunctionDefinition",
+            "parameters": [
+              {
+                "name": "headStart",
+                "nodeType": "YulTypedName",
+                "src": "1150:9:2",
+                "type": ""
+              },
+              {
+                "name": "dataEnd",
+                "nodeType": "YulTypedName",
+                "src": "1161:7:2",
+                "type": ""
+              }
+            ],
+            "returnVariables": [
+              {
+                "name": "value0",
+                "nodeType": "YulTypedName",
+                "src": "1173:6:2",
+                "type": ""
+              }
+            ],
+            "src": "1077:403:2"
+          }
+        ]
+      },
+      "contents": "{\n\n    function allocate_unbounded() -> memPtr {\n        memPtr := mload(64)\n    }\n\n    function revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() {\n        revert(0, 0)\n    }\n\n    function revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() {\n        revert(0, 0)\n    }\n\n    function cleanup_t_uint160(value) -> cleaned {\n        cleaned := and(value, 0xffffffffffffffffffffffffffffffffffffffff)\n    }\n\n    function cleanup_t_address(value) -> cleaned {\n        cleaned := cleanup_t_uint160(value)\n    }\n\n    function cleanup_t_contract$_RideHailingAccounts_$56(value) -> cleaned {\n        cleaned := cleanup_t_address(value)\n    }\n\n    function validator_revert_t_contract$_RideHailingAccounts_$56(value) {\n        if iszero(eq(value, cleanup_t_contract$_RideHailingAccounts_$56(value))) { revert(0, 0) }\n    }\n\n    function abi_decode_t_contract$_RideHailingAccounts_$56_fromMemory(offset, end) -> value {\n        value := mload(offset)\n        validator_revert_t_contract$_RideHailingAccounts_$56(value)\n    }\n\n    function abi_decode_tuple_t_contract$_RideHailingAccounts_$56_fromMemory(headStart, dataEnd) -> value0 {\n        if slt(sub(dataEnd, headStart), 32) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }\n\n        {\n\n            let offset := 0\n\n            value0 := abi_decode_t_contract$_RideHailingAccounts_$56_fromMemory(add(headStart, offset), dataEnd)\n        }\n\n    }\n\n}\n",
+      "id": 2,
+      "language": "Yul",
+      "name": "#utility.yul"
+    }
+  ],
+  "deployedGeneratedSources": [],
+  "sourceMap": "103:350:1:-:0;;;187:133;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;287:26;257:27;;:56;;;;;;;;;;;;;;;;;;187:133;103:350;;88:117:2;197:1;194;187:12;334:126;371:7;411:42;404:5;400:54;389:65;;334:126;;;:::o;466:96::-;503:7;532:24;550:5;532:24;:::i;:::-;521:35;;466:96;;;:::o;568:122::-;631:7;660:24;678:5;660:24;:::i;:::-;649:35;;568:122;;;:::o;696:174::-;795:50;839:5;795:50;:::i;:::-;788:5;785:61;775:89;;860:1;857;850:12;775:89;696:174;:::o;876:195::-;959:5;990:6;984:13;975:22;;1006:59;1059:5;1006:59;:::i;:::-;876:195;;;;:::o;1077:403::-;1173:6;1222:2;1210:9;1201:7;1197:23;1193:32;1190:119;;;1228:79;;:::i;:::-;1190:119;1348:1;1373:90;1455:7;1446:6;1435:9;1431:22;1373:90;:::i;:::-;1363:100;;1319:154;1077:403;;;;:::o;103:350:1:-;;;;;;;",
+  "deployedSourceMap": "103:350:1:-:0;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.4.22 <0.9.0;\n\nimport \"./RideHailingAccounts.sol\";\n\ncontract RideHailingApp {\n    RideHailingAccounts rideHailingAccountsContract;\n\n    constructor(RideHailingAccounts rideHailingAccountsAddress) {\n        rideHailingAccountsContract = rideHailingAccountsAddress;\n    }\n\n    modifier registeredAccountOnly() {\n        require(rideHailingAccountsContract.accountExists(msg.sender));\n        _;\n    }\n\n\n}\n",
+  "sourcePath": "/Users/sunyitao/Documents/School/Semesters/Y4S2/IS4302/Ride-Hailing-Blockchain-App/contracts/RideHailingApp.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/RideHailingApp.sol",
+    "exportedSymbols": {
+      "RideHailingAccounts": [
+        56
+      ],
+      "RideHailingApp": [
+        86
+      ]
+    },
+    "id": 87,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 58,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".22",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:32:1"
+      },
+      {
+        "absolutePath": "project:/contracts/RideHailingAccounts.sol",
+        "file": "./RideHailingAccounts.sol",
+        "id": 59,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 87,
+        "sourceUnit": 57,
+        "src": "66:35:1",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "RideHailingApp",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 86,
+        "linearizedBaseContracts": [
+          86
+        ],
+        "name": "RideHailingApp",
+        "nameLocation": "112:14:1",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 62,
+            "mutability": "mutable",
+            "name": "rideHailingAccountsContract",
+            "nameLocation": "153:27:1",
+            "nodeType": "VariableDeclaration",
+            "scope": 86,
+            "src": "133:47:1",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+              "typeString": "contract RideHailingAccounts"
+            },
+            "typeName": {
+              "id": 61,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 60,
+                "name": "RideHailingAccounts",
+                "nameLocations": [
+                  "133:19:1"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 56,
+                "src": "133:19:1"
+              },
+              "referencedDeclaration": 56,
+              "src": "133:19:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+                "typeString": "contract RideHailingAccounts"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 72,
+              "nodeType": "Block",
+              "src": "247:73:1",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 70,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 68,
+                      "name": "rideHailingAccountsContract",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 62,
+                      "src": "257:27:1",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+                        "typeString": "contract RideHailingAccounts"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 69,
+                      "name": "rideHailingAccountsAddress",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 65,
+                      "src": "287:26:1",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+                        "typeString": "contract RideHailingAccounts"
+                      }
+                    },
+                    "src": "257:56:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+                      "typeString": "contract RideHailingAccounts"
+                    }
+                  },
+                  "id": 71,
+                  "nodeType": "ExpressionStatement",
+                  "src": "257:56:1"
+                }
+              ]
+            },
+            "id": 73,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 66,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 65,
+                  "mutability": "mutable",
+                  "name": "rideHailingAccountsAddress",
+                  "nameLocation": "219:26:1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 73,
+                  "src": "199:46:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+                    "typeString": "contract RideHailingAccounts"
+                  },
+                  "typeName": {
+                    "id": 64,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 63,
+                      "name": "RideHailingAccounts",
+                      "nameLocations": [
+                        "199:19:1"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 56,
+                      "src": "199:19:1"
+                    },
+                    "referencedDeclaration": 56,
+                    "src": "199:19:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+                      "typeString": "contract RideHailingAccounts"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "198:48:1"
+            },
+            "returnParameters": {
+              "id": 67,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "247:0:1"
+            },
+            "scope": 86,
+            "src": "187:133:1",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 84,
+              "nodeType": "Block",
+              "src": "359:90:1",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "expression": {
+                              "id": 78,
+                              "name": "msg",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 4294967281,
+                              "src": "419:3:1",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_magic_message",
+                                "typeString": "msg"
+                              }
+                            },
+                            "id": 79,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "423:6:1",
+                            "memberName": "sender",
+                            "nodeType": "MemberAccess",
+                            "src": "419:10:1",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "expression": {
+                            "id": 76,
+                            "name": "rideHailingAccountsContract",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 62,
+                            "src": "377:27:1",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_RideHailingAccounts_$56",
+                              "typeString": "contract RideHailingAccounts"
+                            }
+                          },
+                          "id": 77,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "405:13:1",
+                          "memberName": "accountExists",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 55,
+                          "src": "377:41:1",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_bool_$",
+                            "typeString": "function (address) view external returns (bool)"
+                          }
+                        },
+                        "id": 80,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "377:53:1",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      ],
+                      "id": 75,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "369:7:1",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+                        "typeString": "function (bool) pure"
+                      }
+                    },
+                    "id": 81,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "369:62:1",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 82,
+                  "nodeType": "ExpressionStatement",
+                  "src": "369:62:1"
+                },
+                {
+                  "id": 83,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "441:1:1"
+                }
+              ]
+            },
+            "id": 85,
+            "name": "registeredAccountOnly",
+            "nameLocation": "335:21:1",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 74,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "356:2:1"
+            },
+            "src": "326:123:1",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 87,
+        "src": "103:350:1",
+        "usedErrors": []
+      }
+    ],
+    "src": "32:422:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.17+commit.8df45f5f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.11",
+  "updatedAt": "2023-03-18T12:55:16.208Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
