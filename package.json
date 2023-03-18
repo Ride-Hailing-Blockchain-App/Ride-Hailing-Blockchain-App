@@ -1,0 +1,25 @@
+{
+  "name": "ride-hailing-blockchain-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ride-Hailing-Blockchain-App/Ride-Hailing-Blockchain-App.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ride-Hailing-Blockchain-App/Ride-Hailing-Blockchain-App/issues"
+  },
+  "homepage": "https://github.com/Ride-Hailing-Blockchain-App/Ride-Hailing-Blockchain-App#readme",
+  "dependencies": {
+    "truffle-assertions": "^0.9.2"
+  }
+}
