@@ -2,18 +2,35 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "./RideHailingAccounts.sol";
+import "./RideHailingPassenger.sol";
+import "./RideHailingRidesDataStorage.sol";
 
 contract RideHailingApp {
-    RideHailingAccounts rideHailingAccountsContract;
+    // interfaces
+    RideHailingAccounts public accountsContract;
+    RideHailingPassenger public passengerContract;
 
-    constructor(RideHailingAccounts rideHailingAccountsAddress) {
-        rideHailingAccountsContract = rideHailingAccountsAddress;
+    // data
+    RideHailingRidesDataStorage private ridesDataStorage;
+
+    /* TODO
+        interfaces:
+        RideHailingDriver driverContract // driver car management, car location updates
+        RideHailingDisputeResolution disputeResolutionContract
+
+        data:
+        RideHailingVehiclesDataStorage vehiclesDataStorage
+        RideHailingDisputesDataStorage disputesDataStorage
+    */
+
+    constructor() {
+        // initialise data storages
+        ridesDataStorage = new RideHailingRidesDataStorage();
+        // initialise interface contracts
+        accountsContract = new RideHailingAccounts();
+        passengerContract = new RideHailingPassenger(
+            accountsContract,
+            ridesDataStorage
+        );
     }
-
-    modifier registeredAccountOnly() {
-        require(rideHailingAccountsContract.accountExists(msg.sender));
-        _;
-    }
-
-
 }
