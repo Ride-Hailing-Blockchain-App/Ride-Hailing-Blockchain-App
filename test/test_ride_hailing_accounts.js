@@ -9,10 +9,15 @@ var RideHailingAccounts = artifacts.require("../contracts/RideHailingAccounts.so
 const oneEth = new BigNumber(1000000000000000000);
 
 contract("test_ride_hailing_accounts", function (accounts) {
-  console.log("Testing RideHailingAccounts contract");
+    before( async() => {
+        appInstance = await RideHailingApp.deployed();
+        accountsAddress = await appInstance.accountsContract();
+        accountsInstance = await RideHailingAccounts.at(accountsAddress);
+    });
+    console.log("Testing RideHailingAccounts contract");
 
-  it("should assert true", async function () {
-    await RideHailingAccounts.deployed();
-    return assert(true);
-  });
+    it("should assert true", async function () {
+        console.log(await accountsInstance.accountExists(accounts[0]));
+        return assert(true);
+    });
 });
