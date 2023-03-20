@@ -23,9 +23,9 @@ contract RideHailingApp {
 
     constructor() {
         // initialise data storages
-        disputesDataStorage = new RideHailingDisputesDataStorage(address(this));
-        ridesDataStorage = new RideHailingRidesDataStorage(address(this));
-        vehiclesDataStorage = new RideHailingVehiclesDataStorage(address(this));
+        disputesDataStorage = new RideHailingDisputesDataStorage();
+        ridesDataStorage = new RideHailingRidesDataStorage();
+        vehiclesDataStorage = new RideHailingVehiclesDataStorage();
         // initialise interface contracts
         accountsContract = new RideHailingAccounts();
         passengerContract = new RideHailingPassenger(

@@ -12,8 +12,6 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     }
     Dispute[] private disputeData;
 
-    constructor(address ownerAddress) DataStorageBaseContract(ownerAddress) {}
-
     function createDispute(
         address plaintiff,
         address defendant,

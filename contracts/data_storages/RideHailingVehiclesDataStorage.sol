@@ -12,8 +12,6 @@ contract RideHailingVehiclesDataStorage is DataStorageBaseContract {
     }
     Vehicle[] private vehicleData;
 
-    constructor(address ownerAddress) DataStorageBaseContract(ownerAddress) {}
-
     function addVehicle(
         string calldata model,
         string calldata color,

@@ -2,12 +2,8 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract DataStorageBaseContract {
-    address private owner;
+    address private ownerContract = msg.sender;
     address[] internalContracts;
-
-    constructor(address ownerContract) {
-        owner = ownerContract;
-    }
 
     function setInternalContractAddresses(
         address[] calldata contractAddresses
@@ -28,7 +24,7 @@ contract DataStorageBaseContract {
     }
 
     modifier ownerOnly() {
-        require(msg.sender == owner, "Can only be called from owner contract");
+        require(msg.sender == ownerContract, "Can only be called from owner contract");
         _;
     }
 }

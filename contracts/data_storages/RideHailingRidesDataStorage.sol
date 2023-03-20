@@ -18,8 +18,6 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     uint256 private rideIdCounter = 0;
     mapping(uint256 => Ride) private ridesData;
 
-    constructor(address ownerAddress) DataStorageBaseContract(ownerAddress) {}
-
     function createRide(
         address passenger,
         string calldata start,
