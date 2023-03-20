@@ -20,7 +20,7 @@ contract RideHailingPassenger {
         uint256 bidAmount,
         string memory startLocation,
         string memory destination
-    ) public payable functionalAccountOnly {
+    ) external payable functionalAccountOnly {
         require(
             msg.value + accountsContract.getAccountBalance(msg.sender) >=
                 bidAmount + accountsContract.MIN_DEPOSIT_AMOUNT(),

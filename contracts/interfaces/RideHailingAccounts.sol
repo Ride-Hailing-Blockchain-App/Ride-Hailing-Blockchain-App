@@ -14,7 +14,7 @@ contract RideHailingAccounts {
 
     constructor() {}
 
-    function createAccount(string memory username) public payable {
+    function createAccount(string memory username) external payable {
         // TODO emit event
         require(!accountExists(msg.sender), "Account already exists");
         require(
@@ -39,7 +39,7 @@ contract RideHailingAccounts {
 
     function getAccountBalance(
         address accountAddress
-    ) public view returns (uint256) {
+    ) external view returns (uint256) {
         // TODO protect with msg.sender == approved contracts only
         return accountBalances[accountAddress];
     }
