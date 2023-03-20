@@ -9,8 +9,8 @@ contract RideHailingAccounts {
         // TODO more fields
     }
 
-    mapping(address => UserDetails) accounts;
-    mapping(address => uint256) accountBalances;
+    mapping(address => UserDetails) private accounts; // TODO should this be split into a data storage as well? Maybe AccountStorage and AccountManagement
+    mapping(address => uint256) private accountBalances;
 
     constructor() {}
 
@@ -39,7 +39,7 @@ contract RideHailingAccounts {
     function getAccountBalance(
         address accountAddress
     ) public view returns (uint256) {
-        // TODO protect with msg.sender/approved contracts only
+        // TODO protect with msg.sender == approved contracts only
         return accountBalances[accountAddress];
     }
 }

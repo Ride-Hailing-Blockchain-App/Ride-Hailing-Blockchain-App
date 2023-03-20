@@ -2,11 +2,11 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "./RideHailingAccounts.sol";
-import "./RideHailingRidesDataStorage.sol";
+import "../data_storages/RideHailingRidesDataStorage.sol";
 
 contract RideHailingPassenger {
-    RideHailingAccounts accountsContract;
-    RideHailingRidesDataStorage ridesDataStorage;
+    RideHailingAccounts private accountsContract;
+    RideHailingRidesDataStorage private ridesDataStorage;
 
     constructor(
         RideHailingAccounts rideHailingAccountsAddress,

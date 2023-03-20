@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./RideHailingAccounts.sol";
-import "./RideHailingPassenger.sol";
+import "./interfaces/RideHailingAccounts.sol";
+import "./interfaces/RideHailingPassenger.sol";
 
-import "./RideHailingDisputesDataStorage.sol";
-import "./RideHailingRidesDataStorage.sol";
-import "./RideHailingVehiclesDataStorage.sol";
+import "./data_storages/RideHailingDisputesDataStorage.sol";
+import "./data_storages/RideHailingRidesDataStorage.sol";
+import "./data_storages/RideHailingVehiclesDataStorage.sol";
 
 contract RideHailingApp {
     // interfaces

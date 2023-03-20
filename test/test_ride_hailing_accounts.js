@@ -4,7 +4,7 @@ const BigNumber = require("bignumber.js");
 var assert = require("assert");
 
 var RideHailingApp = artifacts.require("../contracts/RideHailingApp.sol");
-var RideHailingAccounts = artifacts.require("../contracts/RideHailingAccounts.sol");
+var RideHailingAccounts = artifacts.require("../contracts/interfaces/RideHailingAccounts.sol");
 
 const oneEth = new BigNumber(1000000000000000000);
 
