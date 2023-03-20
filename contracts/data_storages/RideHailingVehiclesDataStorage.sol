@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-contract RideHailingVehiclesDataStorage {
+import "./DataStorageBaseContract.sol";
+
+contract RideHailingVehiclesDataStorage is DataStorageBaseContract {
     struct Vehicle {
         uint256 vehicleId;
         string model;
@@ -10,9 +12,13 @@ contract RideHailingVehiclesDataStorage {
     }
     Vehicle[] private vehicleData;
 
-    constructor() {}
+    constructor(address ownerAddress) DataStorageBaseContract(ownerAddress) {}
 
-    function addVehicle(string memory model, string memory color, string memory license_number) public returns (uint256) {
+    function addVehicle(
+        string calldata model,
+        string calldata color,
+        string calldata license_number
+    ) external internalContractsOnly returns (uint256) {
         uint256 vehicleId = vehicleData.length;
         vehicleData.push(Vehicle(vehicleId, model, color, license_number));
         return vehicleId;

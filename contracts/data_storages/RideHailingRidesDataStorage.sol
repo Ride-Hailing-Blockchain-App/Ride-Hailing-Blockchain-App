@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-contract RideHailingRidesDataStorage {
+import "./DataStorageBaseContract.sol";
+
+contract RideHailingRidesDataStorage is DataStorageBaseContract {
     struct Ride {
         uint256 rideId;
         address passenger;
@@ -16,15 +18,14 @@ contract RideHailingRidesDataStorage {
     uint256 private rideIdCounter = 0;
     mapping(uint256 => Ride) private ridesData;
 
-    constructor() {}
+    constructor(address ownerAddress) DataStorageBaseContract(ownerAddress) {}
 
     function createRide(
         address passenger,
-        string memory start,
-        string memory destination,
+        string calldata start,
+        string calldata destination,
         uint256 fare
-    ) public {
-        // TODO require msg.sender from approved contracts? `internal` doesn't work here
+    ) external internalContractsOnly returns (uint256) {
         ridesData[rideIdCounter] = Ride(
             rideIdCounter,
             passenger,
@@ -36,6 +37,6 @@ contract RideHailingRidesDataStorage {
             false,
             false
         );
-        rideIdCounter++;
+        return rideIdCounter++;
     }
 }
