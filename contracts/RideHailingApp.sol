@@ -3,7 +3,6 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "./interfaces/RideHailingAccounts.sol";
 import "./interfaces/RideHailingPassenger.sol";
-
 import "./data_storages/RideHailingDisputesDataStorage.sol";
 import "./data_storages/RideHailingRidesDataStorage.sol";
 import "./data_storages/RideHailingVehiclesDataStorage.sol";

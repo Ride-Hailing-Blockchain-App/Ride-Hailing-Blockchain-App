@@ -16,8 +16,12 @@ contract("test_ride_hailing_accounts", function (accounts) {
     });
     console.log("Testing RideHailingAccounts contract");
 
-    it("should assert true", async function () {
-        console.log(await accountsInstance.accountExists(accounts[0]));
-        return assert(true);
+    it("Account not exist", async function () {
+        return assert(!await accountsInstance.accountExists(accounts[0]));
+    });
+
+    it("Create account", async function () {
+        let createAccount = await accountsInstance.createAccount("username", {from: accounts[0], value: oneEth.dividedBy(10)});
+        return assert(await accountsInstance.accountExists(accounts[0]));
     });
 });

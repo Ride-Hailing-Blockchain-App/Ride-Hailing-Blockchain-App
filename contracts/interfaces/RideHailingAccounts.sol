@@ -15,6 +15,7 @@ contract RideHailingAccounts {
     constructor() {}
 
     function createAccount(string memory username) public payable {
+        // TODO emit event
         require(!accountExists(msg.sender), "Account already exists");
         require(
             msg.value >= MIN_DEPOSIT_AMOUNT,
