@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "./RideHailingAccounts.sol";
+import "../data_storages/RideHailingAccountsDataStorage.sol";
 import "../data_storages/RideHailingRidesDataStorage.sol";
 
 contract RideHailingPassenger {
-    RideHailingAccounts private accountsContract;
+    RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
 
     constructor(
-        RideHailingAccounts rideHailingAccountsAddress,
+        RideHailingAccountsDataStorage accountsDataStorageAddress,
         RideHailingRidesDataStorage ridesDataStorageAddress
     ) {
-        accountsContract = rideHailingAccountsAddress;
+        accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
     }
 
@@ -22,8 +22,8 @@ contract RideHailingPassenger {
         string memory destination
     ) external payable functionalAccountOnly {
         require(
-            msg.value + accountsContract.getAccountBalance(msg.sender) >=
-                bidAmount + accountsContract.MIN_DEPOSIT_AMOUNT(),
+            msg.value + accountsDataStorage.getAccountBalance(msg.sender) >=
+                bidAmount + accountsDataStorage.MIN_DEPOSIT_AMOUNT(),
             "Insufficient value sent"
         );
         ridesDataStorage.createRide(
@@ -38,11 +38,11 @@ contract RideHailingPassenger {
 
     modifier functionalAccountOnly() {
         require(
-            accountsContract.accountExists(msg.sender),
+            accountsDataStorage.accountExists(msg.sender),
             "Account does not exist"
         );
         require(
-            accountsContract.accountIsFunctional(msg.sender),
+            accountsDataStorage.accountIsFunctional(msg.sender),
             "Minimum deposit not met"
         );
         _;
