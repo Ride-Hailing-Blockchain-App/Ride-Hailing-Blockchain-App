@@ -3,6 +3,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "./interfaces/RideHailingAccountManagement.sol";
 import "./interfaces/RideHailingPassenger.sol";
+import "./interfaces/RideHailingDriver.sol";
 import "./data_storages/RideHailingAccountsDataStorage.sol";
 import "./data_storages/RideHailingDisputesDataStorage.sol";
 import "./data_storages/RideHailingRidesDataStorage.sol";
@@ -12,8 +13,8 @@ contract RideHailingApp {
     // interfaces
     RideHailingAccountManagement public accountsContract;
     RideHailingPassenger public passengerContract;
+    RideHailingDriver public driverContract;
     /* TODO
-        RideHailingDriver driverContract // driver car management, car location updates
         RideHailingDisputeResolution disputeResolutionContract
     */
 
@@ -37,11 +38,16 @@ contract RideHailingApp {
             accountsDataStorage,
             ridesDataStorage
         );
-
-        address[] memory internalAddresses = new address[](3);
+        driverContract = new RideHailingDriver(
+            accountsDataStorage,
+            ridesDataStorage,
+            vehiclesDataStorage
+        );
+        address[] memory internalAddresses = new address[](4);
         internalAddresses[0] = address(this);
         internalAddresses[1] = address(accountsContract);
         internalAddresses[2] = address(passengerContract);
+        internalAddresses[3] = address(driverContract);
         accountsDataStorage.setInternalContractAddresses(internalAddresses);
         disputesDataStorage.setInternalContractAddresses(internalAddresses);
         ridesDataStorage.setInternalContractAddresses(internalAddresses);
