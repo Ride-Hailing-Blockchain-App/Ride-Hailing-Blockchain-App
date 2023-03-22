@@ -32,9 +32,26 @@ contract RideHailingPassenger {
             destination,
             bidAmount
         );
+
+        accountsDataStorage.add(msg.value, msg.sender);
     }
 
     // editRide
+
+    function acceptDriver(uint256 rideId) external functionalAccountOnly {
+        ridesDataStorage.acceptByPassenger(rideId, msg.sender);
+    }
+
+    function rideCompleted(uint256 rideId) external functionalAccountOnly {
+        uint256 fare = ridesDataStorage.getFare(rideId);
+        address driver = ridesDataStorage.getDriver(rideId);
+        require(
+            accountsDataStorage.getAccountBalance(msg.sender) >= fare,
+            "Insufficient value"
+        );
+        ridesDataStorage.completeByPassenger(rideId, msg.sender);
+        accountsDataStorage.transfer(fare, msg.sender, driver); // driver must complete first
+    }
 
     modifier functionalAccountOnly() {
         require(
