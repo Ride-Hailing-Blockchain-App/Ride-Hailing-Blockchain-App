@@ -11,10 +11,10 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         string start; // lattitude, longitude string
         string destination;
         uint256 fare;
+        bool acceptedByPassenger;
         bool passengerRideCompleted;
         bool driverRideCompleted;
         bool inDispute;
-        bool acceptedByPassenger;
     }
     uint256 private rideIdCounter = 0;
     mapping(uint256 => Ride) private ridesData;
@@ -40,41 +40,28 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         return rideIdCounter++;
     }
 
-    function getAllIncompleteRides()
+    function getOpenRideRequests()
         external
         view
         internalContractsOnly
         returns (Ride[] memory)
     {
-        Ride[] memory incompleteRides = new Ride[](rideIdCounter);
-        uint256 counter = 0;
+        // solidity does not support dynamic sized arrays in memory, so we have to calculate the size of the array first
+        uint256 numOpenRideRequests = 0;
         for (uint256 i = 0; i < rideIdCounter; i++) {
-            if (
-                !ridesData[i].passengerRideCompleted &&
-                !ridesData[i].driverRideCompleted
-            ) {
-                incompleteRides[counter] = ridesData[i];
+            if (ridesData[i].driver == address(0)) {
+                numOpenRideRequests++;
             }
         }
-        return incompleteRides;
-    }
-
-    function getIncompleteRidesByLocation()
-        external
-        view
-        internalContractsOnly
-        returns (Ride[] memory)
-    {
-        Ride[] memory allIncompleteRides = this.getAllIncompleteRides();
-        uint256 lastIdx = 2 > allIncompleteRides.length
-            ? allIncompleteRides.length
-            : 2; // dummy: get first two rides from list
-        //TODO Improve dummy
-        Ride[] memory incompleteRides = new Ride[](10);
-        for (uint256 i = 0; i < lastIdx; i++) {
-            incompleteRides[i] = allIncompleteRides[i];
+        Ride[] memory openRides = new Ride[](numOpenRideRequests);
+        uint256 j = 0;
+        for (uint256 i = 0; i < rideIdCounter; i++) {
+            if (ridesData[i].driver == address(0)) {
+                openRides[j] = ridesData[i];
+                j++;
+            }
         }
-        return incompleteRides;
+        return openRides;
     }
 
     function acceptByDriver(
@@ -84,7 +71,6 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         external
         internalContractsOnly
         validRideId(rideId)
-        isDriver(rideId, driver)
     {
         ridesData[rideId].driver = driver;
     }

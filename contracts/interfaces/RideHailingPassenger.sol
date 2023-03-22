@@ -32,8 +32,7 @@ contract RideHailingPassenger {
             destination,
             bidAmount
         );
-
-        accountsDataStorage.add(msg.value, msg.sender);
+        accountsDataStorage.addBalance(msg.value, msg.sender);
     }
 
     // editRide
@@ -42,7 +41,7 @@ contract RideHailingPassenger {
         ridesDataStorage.acceptByPassenger(rideId, msg.sender);
     }
 
-    function rideCompleted(uint256 rideId) external functionalAccountOnly {
+    function completeRide(uint256 rideId) external functionalAccountOnly {
         uint256 fare = ridesDataStorage.getFare(rideId);
         address driver = ridesDataStorage.getDriver(rideId);
         require(
