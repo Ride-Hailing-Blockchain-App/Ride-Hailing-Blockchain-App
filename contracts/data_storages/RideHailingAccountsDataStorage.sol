@@ -40,19 +40,20 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         return accountBalances[accountAddress];
     }
 
-    function add(
-        uint256 amtToAdd,
+    function addBalance(
+        uint256 amount,
         address accountAddress
     ) external internalContractsOnly {
-        accountBalances[accountAddress] += amtToAdd;
+        accountBalances[accountAddress] += amount;
     }
 
     function transfer(
-        uint256 amt,
+        uint256 amount,
         address from,
         address to
     ) external internalContractsOnly {
-        accountBalances[from] -= amt;
-        accountBalances[to] += amt;
+        require(accountBalances[from] >= amount, "Insufficient account balance");
+        accountBalances[from] -= amount;
+        accountBalances[to] += amount;
     }
 }
