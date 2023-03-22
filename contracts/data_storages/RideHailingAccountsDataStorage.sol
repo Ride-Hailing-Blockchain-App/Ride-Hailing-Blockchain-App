@@ -39,4 +39,20 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
     ) external view internalContractsOnly returns (uint256) {
         return accountBalances[accountAddress];
     }
+
+    function add(
+        uint256 amtToAdd,
+        address accountAddress
+    ) external internalContractsOnly {
+        accountBalances[accountAddress] += amtToAdd;
+    }
+
+    function transfer(
+        uint256 amt,
+        address from,
+        address to
+    ) external internalContractsOnly {
+        accountBalances[from] -= amt;
+        accountBalances[to] += amt;
+    }
 }
