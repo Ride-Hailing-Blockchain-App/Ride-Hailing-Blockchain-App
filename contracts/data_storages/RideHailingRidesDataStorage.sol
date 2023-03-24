@@ -47,6 +47,7 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         returns (Ride[] memory)
     {
         // solidity does not support dynamic sized arrays in memory, so we have to calculate the size of the array first
+        // can use push?
         uint256 numOpenRideRequests = 0;
         for (uint256 i = 0; i < rideIdCounter; i++) {
             if (ridesData[i].driver == address(0)) {
@@ -67,11 +68,7 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     function acceptByDriver(
         uint256 rideId,
         address driver
-    )
-        external
-        internalContractsOnly
-        validRideId(rideId)
-    {
+    ) external internalContractsOnly validRideId(rideId) {
         ridesData[rideId].driver = driver;
     }
 

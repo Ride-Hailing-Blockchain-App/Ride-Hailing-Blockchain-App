@@ -36,7 +36,8 @@ contract RideHailingApp {
         );
         passengerContract = new RideHailingPassenger(
             accountsDataStorage,
-            ridesDataStorage
+            ridesDataStorage,
+            disputesDataStorage
         );
         driverContract = new RideHailingDriver(
             accountsDataStorage,
