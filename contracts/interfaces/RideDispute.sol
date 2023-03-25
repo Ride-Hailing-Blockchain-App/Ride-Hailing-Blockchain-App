@@ -26,7 +26,7 @@ contract RideDispute{
         require(accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DEPOSIT_AMOUNT, "Account does not have enough deposit to create a dispute");
         require(defendant != msg.sender, "You cannot make a dispute with yourself!");
         disputesDataStorage.createDispute(msg.sender, defendant, description);
-        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(disputesDataStorage)); //disputeDataStorage will hold the deposits
+        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(this)); //disputeDataStorage will hold the deposits
     }
 
     function respondDispute(uint256 disputeId, string calldata replyDescription) external {
@@ -35,21 +35,47 @@ contract RideDispute{
         require(msg.sender == defendant, "You are not the correct defendant!");
         require(accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DEPOSIT_AMOUNT, "Account does not have enough deposit to respond a dispute");
         disputesDataStorage.setPlaintiffDescription(disputeId, replyDescription);
-        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(disputesDataStorage)); //disputeDataStorage will hold the deposit from the plaintiff
+        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(this)); //disputeDataStorage will hold the deposit from the plaintiff
     }
 
     function voteDispute(uint256 disputeId, uint256 disputer) external {
+        require(msg.sender != disputesDataStorage.getDefendant(disputeId) && msg.sender != disputesDataStorage.getPlaintiff(disputeId), "You cannot vote for yourself!");
         // 1 = plaintiff, 2 = defendant
         require(disputer == 1|| disputer == 2, "Please input correct number to vote for!");
         require(disputesDataStorage.checkDisputeExist(disputeId) == true, "No such dispute exist!");
         if(disputer == 1) {
-            disputesDataStorage.increasePlaintiffVotes(disputeId);
+            disputesDataStorage.increasePlaintiffVotes(disputeId, msg.sender); //must add msg.sender to voterlist to avoid repeated votes
         } else {
-            disputesDataStorage.increaseDefendantVotes(disputeId);
+            disputesDataStorage.increaseDefendantVotes(disputeId, msg.sender);
         }
 
-        //Do up a scenario when maxvotes reached
+        //when total vote count reaches the max
+        if(disputesDataStorage.getDefendantVotes(disputeId) + disputesDataStorage.getPlaintiffVotes(disputeId) == MAX_VOTES) {
+            this.endVote(disputeId);
+        }
     }
 
-    //Do up the function for when votes end
+    function endVote(uint256 disputeId) external {
+        uint256 plaintiffVotes = disputesDataStorage.getPlaintiffVotes(disputeId);
+        uint256 defendantVotes = disputesDataStorage.getDefendantVotes(disputeId);
+        uint256 totalVotes = plaintiffVotes + defendantVotes;
+        address[] memory winners = new address [] (0);
+
+        if(plaintiffVotes >= (totalVotes/5*3)) { // plaintiff wins if 60 percent or more belongs to plaintiff
+            winners = disputesDataStorage.won(disputeId, 1);
+            accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, address(this), disputesDataStorage.getPlaintiff(disputeId));
+            //need to transfer ride fee as well
+        } else if (defendantVotes >= (totalVotes/5*3)) {
+            winners = disputesDataStorage.won(disputeId, 2);
+            accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, address(this), disputesDataStorage.getDefendant(disputeId));
+        } else {
+            accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, address(this), disputesDataStorage.getDefendant(disputeId));
+            accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, address(this), disputesDataStorage.getPlaintiff(disputeId));
+        }
+
+        uint256 winnerPrize = MIN_DEPOSIT_AMOUNT/winners.length;
+        for(uint256 i = 0; i < winners.length; i++) {
+            accountsDataStorage.transfer(winnerPrize, address(this), winners[i]);
+        }
+    }
 }
