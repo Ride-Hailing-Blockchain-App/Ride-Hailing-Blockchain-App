@@ -7,24 +7,24 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     struct Dispute {
         address plaintiff;
         address defendant;
-        string description;
-        string replyDescription;
+        string complaintDescription;
+        string defenseDescription;
         bool resolved;
         uint256 plaintiffVotes;
         uint256 defendantVotes;
         address [] voterList; //only one person can vote once
-        uint256 [] voterChoice;
-        address [] voterWinners;
+        uint8 [] voterChoice;
+        address [] voteWinners;
     }
     Dispute[] private disputeData;
 
     function createDispute(
         address plaintiff,
         address defendant,
-        string calldata description
+        string calldata complaintDescription
     ) external internalContractsOnly returns (uint256) {
         uint256 disputeId = disputeData.length;
-        disputeData.push(Dispute(plaintiff, defendant, description, "", false, 0, 0, new address [] (0), new uint256 [] (0), new address [] (0) ));
+        disputeData.push(Dispute(plaintiff, defendant, complaintDescription, "", false, 0, 0, new address [] (0), new uint8 [] (0), new address [] (0) ));
         return disputeId;
     }
 
@@ -32,8 +32,8 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId];
     }
 
-    function setPlaintiffDescription(uint256 disputeId, string calldata replyDescription) external internalContractsOnly {
-        disputeData[disputeId].replyDescription = replyDescription;
+    function setDefenseDescription(uint256 disputeId, string calldata defenseDescription) external internalContractsOnly {
+        disputeData[disputeId].defenseDescription = defenseDescription;
     }
 
     function increasePlaintiffVotes(uint256 disputeId, address voter) external internalContractsOnly {
@@ -74,12 +74,12 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     }
 
     function won(uint256 disputeId, uint256 winner) external internalContractsOnly returns (address[] memory) {
-        uint256 [] memory voterChoiceFinal = disputeData[disputeId].voterChoice;
+        uint8 [] memory voterChoiceFinal = disputeData[disputeId].voterChoice;
         for(uint256 i = 0; i <= voterChoiceFinal.length; i++) {
             if(voterChoiceFinal[i] == winner) {
-                disputeData[disputeId].voterWinners.push(disputeData[disputeId].voterList[i]);
+                disputeData[disputeId].voteWinners.push(disputeData[disputeId].voterList[i]);
             }
         }
-        return disputeData[disputeId].voterWinners;
+        return disputeData[disputeId].voteWinners;
     }
 }
