@@ -8,7 +8,8 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
 
     struct UserDetails {
         string username;
-        // TODO more fields
+        uint256[] ratings;
+        uint256 overallRating;
     }
 
     mapping(address => UserDetails) private accounts;
@@ -21,7 +22,7 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
     ) external internalContractsOnly {
         require(!accountExists(userAddress), "Account already exists");
         accountBalances[userAddress] = deposit;
-        accounts[userAddress] = UserDetails(username);
+        accounts[userAddress] = UserDetails(username, new uint256[](0), (0));
     }
 
     function accountExists(address accountAddress) public view returns (bool) {
@@ -40,6 +41,12 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         return accountBalances[accountAddress];
     }
 
+    function getOverallRating(
+        address accountAddress
+    ) external view returns (uint256) {
+        return accounts[accountAddress].overallRating;
+    }
+
     function addBalance(
         uint256 amount,
         address accountAddress
@@ -47,12 +54,27 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         accountBalances[accountAddress] += amount;
     }
 
+    function rateUser(uint256 score, address accountAddress) external {
+        uint256 size = accounts[accountAddress].ratings.length;
+        uint256 overallRating = accounts[accountAddress].overallRating;
+        overallRating = (overallRating * size + score) / (size + 1);
+        accounts[accountAddress].overallRating = overallRating;
+        accounts[accountAddress].ratings.push(score);
+    }
+
+    function reduceRating(address accountAddress) external {
+        accounts[accountAddress].overallRating -= (uint(1) / uint(2));
+    }
+
     function transfer(
         uint256 amount,
         address from,
         address to
     ) external internalContractsOnly {
-        require(accountBalances[from] >= amount, "Insufficient account balance");
+        require(
+            accountBalances[from] >= amount,
+            "Insufficient account balance"
+        );
         accountBalances[from] -= amount;
         accountBalances[to] += amount;
     }
