@@ -52,6 +52,28 @@ contract RideHailingPassenger {
         accountsDataStorage.transfer(fare, msg.sender, driver); // driver must complete first
     }
 
+    function rateDriver(
+        uint256 rideId,
+        uint256 score
+    ) external functionalAccountOnly {
+        require(
+            ridesDataStorage.rideCompleted(rideId),
+            "Ride has not been marked as completed"
+        );
+
+        require(
+            score <= 5 && score >= 0,
+            "Invalid Rating. Rating must be between 0 and 5"
+        );
+        require(
+            ridesDataStorage.getRatingForDriver(rideId) == 0,
+            "You have rated this driver previously"
+        );
+        ridesDataStorage.rateDriver(rideId, score);
+        address driver = ridesDataStorage.getDriver(rideId);
+        accountsDataStorage.rateUser(score, driver);
+    }
+
     modifier functionalAccountOnly() {
         require(
             accountsDataStorage.accountExists(msg.sender),

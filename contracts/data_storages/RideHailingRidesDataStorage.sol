@@ -15,6 +15,8 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         bool passengerRideCompleted;
         bool driverRideCompleted;
         bool inDispute;
+        uint256 ratingForPassenger;
+        uint256 ratingForDriver;
     }
     uint256 private rideIdCounter = 0;
     mapping(uint256 => Ride) private ridesData;
@@ -35,7 +37,9 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
             false,
             false,
             false,
-            false
+            false,
+            0,
+            0
         );
         return rideIdCounter++;
     }
@@ -67,11 +71,7 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     function acceptByDriver(
         uint256 rideId,
         address driver
-    )
-        external
-        internalContractsOnly
-        validRideId(rideId)
-    {
+    ) external internalContractsOnly validRideId(rideId) {
         ridesData[rideId].driver = driver;
     }
 
@@ -119,6 +119,22 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         ridesData[rideId].driverRideCompleted = true;
     }
 
+    function rateDriver(
+        uint256 rideId,
+        uint256 score
+    ) external validRideId(rideId) {
+        // require condition in interface
+        ridesData[rideId].ratingForDriver = score;
+    }
+
+    function ratePassenger(
+        uint256 rideId,
+        uint256 score
+    ) external validRideId(rideId) {
+        // require condition in interface
+        ridesData[rideId].ratingForPassenger = score;
+    }
+
     function getFare(
         uint256 rideId
     )
@@ -141,6 +157,43 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         returns (address)
     {
         return ridesData[rideId].driver;
+    }
+
+    function getPassenger(
+        uint256 rideId
+    )
+        external
+        view
+        internalContractsOnly
+        validRideId(rideId)
+        returns (address)
+    {
+        return ridesData[rideId].passenger;
+    }
+
+    function getRide(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (Ride memory) {
+        return ridesData[rideId];
+    }
+
+    function rideCompleted(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (bool) {
+        Ride memory ride = this.getRide(rideId);
+        return ride.passengerRideCompleted && ride.driverRideCompleted;
+    }
+
+    function getRatingForPassenger(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (uint256) {
+        return ridesData[rideId].ratingForPassenger;
+    }
+
+    function getRatingForDriver(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (uint256) {
+        return ridesData[rideId].ratingForDriver;
     }
 
     modifier isPassenger(uint256 rideId, address passenger) {

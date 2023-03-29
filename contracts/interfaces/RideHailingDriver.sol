@@ -28,18 +28,24 @@ contract RideHailingDriver {
         vehiclesDataStorage.addVehicle(model, color, license_number);
     }
 
-    function getRideRequestsNearLocation(string calldata driverLocation)
+    function getRideRequestsNearLocation(
+        string calldata driverLocation
+    )
         external
         view
         functionalAccountOnly
         returns (RideHailingRidesDataStorage.Ride[] memory)
     {
-        RideHailingRidesDataStorage.Ride[] memory openRideRequests = ridesDataStorage.getOpenRideRequests();
+        RideHailingRidesDataStorage.Ride[]
+            memory openRideRequests = ridesDataStorage.getOpenRideRequests();
         uint256 lastIdx = 2 > openRideRequests.length
             ? openRideRequests.length
             : 2; // dummy oracle: get first two rides from list
         //TODO this should be from a separate oracle contract
-        RideHailingRidesDataStorage.Ride[] memory nearbyOpenRides = new RideHailingRidesDataStorage.Ride[](lastIdx);
+        RideHailingRidesDataStorage.Ride[]
+            memory nearbyOpenRides = new RideHailingRidesDataStorage.Ride[](
+                lastIdx
+            );
         for (uint256 i = 0; i < lastIdx; i++) {
             nearbyOpenRides[i] = openRideRequests[i];
         }
@@ -54,6 +60,27 @@ contract RideHailingDriver {
 
     function completeRide(uint256 rideId) external functionalAccountOnly {
         ridesDataStorage.completeByDriver(rideId, msg.sender);
+    }
+
+    function ratePassenger(
+        uint256 rideId,
+        uint256 score
+    ) external functionalAccountOnly {
+        require(
+            ridesDataStorage.rideCompleted(rideId),
+            "Ride has not been marked as completed"
+        );
+        require(
+            score <= 5 && score >= 0,
+            "Invalid Rating. Rating must be between 0 and 5"
+        );
+        require(
+            ridesDataStorage.getRatingForPassenger(rideId) == 0,
+            "You have rated this passenger previously"
+        );
+        ridesDataStorage.ratePassenger(rideId, score);
+        address passenger = ridesDataStorage.getPassenger(rideId);
+        accountsDataStorage.rateUser(score, passenger);
     }
 
     modifier functionalAccountOnly() {
