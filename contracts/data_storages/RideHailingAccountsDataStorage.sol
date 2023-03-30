@@ -5,10 +5,12 @@ import "./DataStorageBaseContract.sol";
 
 contract RideHailingAccountsDataStorage is DataStorageBaseContract {
     uint public constant MIN_DEPOSIT_AMOUNT = 20000000000000000; // about 50 SGD
+    uint8 public constant MAX_USER_RATING = 10;
 
     struct UserDetails {
         string username;
-        uint256[] ratings;
+        uint256 totalRatingSum;
+        uint256 numRatings;
         uint256 overallRating;
     }
 
@@ -22,7 +24,7 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
     ) external payable internalContractsOnly {
         require(!accountExists(userAddress), "Account already exists");
         accountBalances[userAddress] = deposit;
-        accounts[userAddress] = UserDetails(username, new uint256[](0), (0));
+        accounts[userAddress] = UserDetails(username, 0, 0, 0);
     }
 
     function accountExists(address accountAddress) public view returns (bool) {
@@ -55,15 +57,21 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
     }
 
     function rateUser(uint256 score, address accountAddress) external {
-        uint256 size = accounts[accountAddress].ratings.length;
-        uint256 overallRating = accounts[accountAddress].overallRating;
-        overallRating = (overallRating * size + score) / (size + 1);
-        accounts[accountAddress].overallRating = overallRating;
-        accounts[accountAddress].ratings.push(score);
+        require(score >= 0 && score <= MAX_USER_RATING, "Score must be an integer from 0 to 10 inclusive");
+        accounts[accountAddress].totalRatingSum += score;
+        accounts[accountAddress].numRatings++;
+        accounts[accountAddress].overallRating = accounts[accountAddress].totalRatingSum / accounts[accountAddress].numRatings; 
     }
 
-    function reduceRating(address accountAddress) external {
-        accounts[accountAddress].overallRating -= (uint(1) / uint(2));
+    function reduceRating(address accountAddress) external internalContractsOnly {
+        if (accounts[accountAddress].totalRatingSum < MAX_USER_RATING) { // subtract a full star rating
+            accounts[accountAddress].totalRatingSum = 0;
+        } else {
+             accounts[accountAddress].totalRatingSum -= MAX_USER_RATING;
+        }
+        if (accounts[accountAddress].numRatings > 0) { // avoid division by 0
+            accounts[accountAddress].overallRating = accounts[accountAddress].totalRatingSum / accounts[accountAddress].numRatings; 
+        }
     }
 
     function transfer(
