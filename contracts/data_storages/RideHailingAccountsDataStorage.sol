@@ -19,7 +19,7 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         address userAddress,
         string calldata username,
         uint256 deposit
-    ) external internalContractsOnly {
+    ) external payable internalContractsOnly {
         require(!accountExists(userAddress), "Account already exists");
         accountBalances[userAddress] = deposit;
         accounts[userAddress] = UserDetails(username, new uint256[](0), (0));
