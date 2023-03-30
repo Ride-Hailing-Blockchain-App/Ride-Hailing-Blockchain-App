@@ -4,20 +4,24 @@ pragma solidity >=0.4.22 <0.9.0;
 import "../data_storages/RideHailingAccountsDataStorage.sol";
 import "../data_storages/RideHailingRidesDataStorage.sol";
 import "../data_storages/RideHailingVehiclesDataStorage.sol";
+import "../oracles/RideHailingOracleInterface.sol";
 
 contract RideHailingDriver {
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingVehiclesDataStorage private vehiclesDataStorage;
+    RideHailingOracleInterface oracleInterface;
 
     constructor(
         RideHailingAccountsDataStorage accountsDataStorageAddress,
         RideHailingRidesDataStorage ridesDataStorageAddress,
-        RideHailingVehiclesDataStorage vehiclesDataStorageAddress
+        RideHailingVehiclesDataStorage vehiclesDataStorageAddress,
+        RideHailingOracleInterface oracleInterfaceAddress
     ) {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
         vehiclesDataStorage = vehiclesDataStorageAddress;
+        oracleInterface = oracleInterfaceAddress;
     }
 
     function registerVehicle(
@@ -30,17 +34,43 @@ contract RideHailingDriver {
 
     function getRideRequestsNearLocation(
         string calldata driverLocation
-    ) external view functionalAccountOnly returns (RideHailingRidesDataStorage.Ride[] memory) {
+    ) external functionalAccountOnly returns (RideHailingRidesDataStorage.Ride[] memory) {
         RideHailingRidesDataStorage.Ride[] memory openRideRequests = ridesDataStorage
             .getOpenRideRequests();
-        uint256 lastIdx = 2 > openRideRequests.length ? openRideRequests.length : 2; // dummy oracle: get first two rides from list
-        //TODO this should be from a separate oracle contract
+        string[] memory passengerLocations = new string[](openRideRequests.length);
+        for (uint i = 0; i < openRideRequests.length; i++) {
+            passengerLocations[i] = openRideRequests[i].start;
+        }
+        uint256 numberOfRequestsDisplayed = openRideRequests.length < 5
+            ? openRideRequests.length
+            : 5;
+        string[] memory closestPassengerLocations = oracleInterface.closestPointsToLocation(
+            passengerLocations,
+            driverLocation,
+            numberOfRequestsDisplayed
+        );
+
         RideHailingRidesDataStorage.Ride[]
-            memory nearbyOpenRides = new RideHailingRidesDataStorage.Ride[](lastIdx);
-        for (uint256 i = 0; i < lastIdx; i++) {
-            nearbyOpenRides[i] = openRideRequests[i];
+            memory nearbyOpenRides = new RideHailingRidesDataStorage.Ride[](
+                numberOfRequestsDisplayed
+            );
+        uint ridesPtr = 0;
+        for (uint i = 0; i < openRideRequests.length; i++) {
+            for (uint j = 0; j < numberOfRequestsDisplayed; j++) {
+                if (
+                    compareStrings(passengerLocations[i], closestPassengerLocations[j]) &&
+                    ridesPtr < numberOfRequestsDisplayed
+                ) {
+                    nearbyOpenRides[ridesPtr] = openRideRequests[i];
+                    ridesPtr++;
+                }
+            }
         }
         return nearbyOpenRides;
+    }
+
+    function compareStrings(string memory a, string memory b) private pure returns (bool) {
+        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 
     function acceptRideRequest(uint256 rideId) external functionalAccountOnly {
