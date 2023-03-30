@@ -28,21 +28,14 @@ contract RideHailingDriver {
         vehiclesDataStorage.addVehicle(model, color, license_number);
     }
 
-<<<<<<< HEAD
-    function viewRideRequests()
-=======
     function getRideRequestsNearLocation(
         string calldata driverLocation
     )
->>>>>>> main
         external
         view
         functionalAccountOnly
         returns (RideHailingRidesDataStorage.Ride[] memory)
     {
-<<<<<<< HEAD
-        return ridesDataStorage.getIncompleteRidesByLocation();
-=======
         RideHailingRidesDataStorage.Ride[]
             memory openRideRequests = ridesDataStorage.getOpenRideRequests();
         uint256 lastIdx = 2 > openRideRequests.length
@@ -57,7 +50,6 @@ contract RideHailingDriver {
             nearbyOpenRides[i] = openRideRequests[i];
         }
         return nearbyOpenRides;
->>>>>>> main
     }
 
     function acceptRideRequest(uint256 rideId) external functionalAccountOnly {
@@ -66,12 +58,6 @@ contract RideHailingDriver {
 
     // cancelRideRequest in case driver accepts accidentally? but passenger must not have accepted on their end (or do without this first to keep things simple)
 
-<<<<<<< HEAD
-    function rideCompleted(uint256 rideId) external functionalAccountOnly {
-        ridesDataStorage.completeByDriver(rideId, msg.sender);
-    }
-
-=======
     function completeRide(uint256 rideId) external functionalAccountOnly {
         ridesDataStorage.completeByDriver(rideId, msg.sender);
     }
@@ -97,7 +83,6 @@ contract RideHailingDriver {
         accountsDataStorage.rateUser(score, passenger);
     }
 
->>>>>>> main
     modifier functionalAccountOnly() {
         require(
             accountsDataStorage.accountExists(msg.sender),

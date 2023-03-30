@@ -26,6 +26,8 @@ contract RideHailingPassenger {
                 bidAmount + accountsDataStorage.MIN_DEPOSIT_AMOUNT(),
             "Insufficient value sent"
         );
+
+        // require();
         ridesDataStorage.createRide(
             msg.sender,
             startLocation,
