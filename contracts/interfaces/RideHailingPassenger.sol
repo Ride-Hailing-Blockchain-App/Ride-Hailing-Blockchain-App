@@ -62,7 +62,7 @@ contract RideHailingPassenger {
         );
 
         require(
-            score <= 5 && score >= 0,
+             score >= 0 && score <= 10,
             "Invalid Rating. Rating must be between 0 and 5"
         );
         require(

@@ -171,17 +171,10 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         return ridesData[rideId].passenger;
     }
 
-    function getRide(
-        uint256 rideId
-    ) external view validRideId(rideId) returns (Ride memory) {
-        return ridesData[rideId];
-    }
-
     function rideCompleted(
         uint256 rideId
     ) external view validRideId(rideId) returns (bool) {
-        Ride memory ride = this.getRide(rideId);
-        return ride.passengerRideCompleted && ride.driverRideCompleted;
+        return ridesData[rideId].passengerRideCompleted && ridesData[rideId].driverRideCompleted;
     }
 
     function getRatingForPassenger(

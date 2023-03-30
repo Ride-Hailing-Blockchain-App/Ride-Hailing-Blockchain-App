@@ -71,8 +71,8 @@ contract RideHailingDriver {
             "Ride has not been marked as completed"
         );
         require(
-            score <= 5 && score >= 0,
-            "Invalid Rating. Rating must be between 0 and 5"
+            score >= 0 && score <= 10,
+            "Invalid Rating. Rating must be between 0 and 10"
         );
         require(
             ridesDataStorage.getRatingForPassenger(rideId) == 0,
