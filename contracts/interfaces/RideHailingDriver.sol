@@ -4,11 +4,13 @@ pragma solidity >=0.4.22 <0.9.0;
 import "../data_storages/RideHailingAccountsDataStorage.sol";
 import "../data_storages/RideHailingRidesDataStorage.sol";
 import "../data_storages/RideHailingVehiclesDataStorage.sol";
+import "../data_storages/RideHailingDisputesDataStorage.sol";
 
 contract RideHailingDriver {
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingVehiclesDataStorage private vehiclesDataStorage;
+    RideHailingDisputesDataStorage private disputesDataStorage;
 
     constructor(
         RideHailingAccountsDataStorage accountsDataStorageAddress,
@@ -81,6 +83,15 @@ contract RideHailingDriver {
         ridesDataStorage.ratePassenger(rideId, score);
         address passenger = ridesDataStorage.getPassenger(rideId);
         accountsDataStorage.rateUser(score, passenger);
+    }
+
+    function withdrawFunds(uint256 withdrawAmt) external functionalAccountOnly {
+        require(
+            disputesDataStorage.hasDispute(msg.sender),
+            "Driver cannot withdraw funds due to ongoing dispute"
+        );
+
+        accountsDataStorage.withdrawFunds(withdrawAmt, msg.sender);
     }
 
     modifier functionalAccountOnly() {

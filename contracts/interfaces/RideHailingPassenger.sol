@@ -3,17 +3,21 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "../data_storages/RideHailingAccountsDataStorage.sol";
 import "../data_storages/RideHailingRidesDataStorage.sol";
+import "../data_storages/RideHailingDisputesDataStorage.sol";
 
 contract RideHailingPassenger {
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
+    RideHailingDisputesDataStorage private disputesDataStorage;
 
     constructor(
         RideHailingAccountsDataStorage accountsDataStorageAddress,
-        RideHailingRidesDataStorage ridesDataStorageAddress
+        RideHailingRidesDataStorage ridesDataStorageAddress,
+        RideHailingDisputesDataStorage disputesDataStorageAddress
     ) {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
+        disputesDataStorage = disputesDataStorageAddress;
     }
 
     function requestRide(
@@ -27,7 +31,10 @@ contract RideHailingPassenger {
             "Insufficient value sent"
         );
 
-        // require();
+        require(
+            ridesDataStorage.hasCurrentRide(msg.sender) == false,
+            "Passenger cannot request ride as previous ride has not been completed"
+        );
         ridesDataStorage.createRide(
             msg.sender,
             startLocation,
@@ -74,6 +81,15 @@ contract RideHailingPassenger {
         ridesDataStorage.rateDriver(rideId, score);
         address driver = ridesDataStorage.getDriver(rideId);
         accountsDataStorage.rateUser(score, driver);
+    }
+
+    function withdrawFunds(uint256 withdrawAmt) external functionalAccountOnly {
+        require(
+            disputesDataStorage.hasDispute(msg.sender),
+            "Passenger cannot withdraw funds due to ongoing dispute"
+        );
+
+        accountsDataStorage.withdrawFunds(withdrawAmt, msg.sender);
     }
 
     modifier functionalAccountOnly() {

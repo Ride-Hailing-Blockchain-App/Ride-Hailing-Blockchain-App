@@ -97,4 +97,16 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         accountBalances[from] -= amount;
         accountBalances[to] += amount;
     }
+
+    function withdrawFunds(
+        uint256 amount,
+        address user
+    ) external internalContractsOnly {
+        require(
+            accountBalances[user] >= amount,
+            "Insufficient account balance"
+        );
+        payable(user).transfer(accountBalances[user]);
+        accountBalances[user] = 0;
+    }
 }
