@@ -34,7 +34,8 @@ contract RideHailingApp {
         vehiclesDataStorage = new RideHailingVehiclesDataStorage();
         // initialise interface contracts
         accountsContract = new RideHailingAccountManagement(
-            accountsDataStorage
+            accountsDataStorage,
+            disputesDataStorage
         );
         passengerContract = new RideHailingPassenger(
             accountsDataStorage,

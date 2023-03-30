@@ -26,6 +26,11 @@ contract RideHailingPassenger {
                 bidAmount + accountsDataStorage.MIN_DEPOSIT_AMOUNT(),
             "Insufficient value sent"
         );
+
+        require(
+            ridesDataStorage.hasCurrentRide(msg.sender) == false,
+            "Passenger cannot request ride as previous ride has not been completed"
+        );
         ridesDataStorage.createRide(
             msg.sender,
             startLocation,
@@ -62,7 +67,7 @@ contract RideHailingPassenger {
         );
 
         require(
-             score >= 0 && score <= 10,
+            score >= 0 && score <= 10,
             "Invalid Rating. Rating must be between 0 and 5"
         );
         require(

@@ -57,20 +57,31 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
     }
 
     function rateUser(uint256 score, address accountAddress) external {
-        require(score >= 0 && score <= MAX_USER_RATING, "Score must be an integer from 0 to 10 inclusive");
+        require(
+            score >= 0 && score <= MAX_USER_RATING,
+            "Score must be an integer from 0 to 10 inclusive"
+        );
         accounts[accountAddress].totalRatingSum += score;
         accounts[accountAddress].numRatings++;
-        accounts[accountAddress].overallRating = accounts[accountAddress].totalRatingSum / accounts[accountAddress].numRatings; 
+        accounts[accountAddress].overallRating =
+            accounts[accountAddress].totalRatingSum /
+            accounts[accountAddress].numRatings;
     }
 
-    function reduceRating(address accountAddress) external internalContractsOnly {
-        if (accounts[accountAddress].totalRatingSum < MAX_USER_RATING) { // subtract a full star rating
+    function reduceRating(
+        address accountAddress
+    ) external internalContractsOnly {
+        if (accounts[accountAddress].totalRatingSum < MAX_USER_RATING) {
+            // subtract a full star rating
             accounts[accountAddress].totalRatingSum = 0;
         } else {
-             accounts[accountAddress].totalRatingSum -= MAX_USER_RATING;
+            accounts[accountAddress].totalRatingSum -= MAX_USER_RATING;
         }
-        if (accounts[accountAddress].numRatings > 0) { // avoid division by 0
-            accounts[accountAddress].overallRating = accounts[accountAddress].totalRatingSum / accounts[accountAddress].numRatings; 
+        if (accounts[accountAddress].numRatings > 0) {
+            // avoid division by 0
+            accounts[accountAddress].overallRating =
+                accounts[accountAddress].totalRatingSum /
+                accounts[accountAddress].numRatings;
         }
     }
 
@@ -85,5 +96,17 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         );
         accountBalances[from] -= amount;
         accountBalances[to] += amount;
+    }
+
+    function withdrawFunds(
+        uint256 amount,
+        address user
+    ) external internalContractsOnly {
+        require(
+            accountBalances[user] >= amount + MIN_DEPOSIT_AMOUNT,
+            "Insufficient account balance"
+        );
+        payable(user).transfer(amount);
+        accountBalances[user] -= amount;
     }
 }

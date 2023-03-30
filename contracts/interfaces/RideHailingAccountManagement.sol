@@ -2,12 +2,18 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 import "../data_storages/RideHailingAccountsDataStorage.sol";
+import "../data_storages/RideHailingDisputesDataStorage.sol";
 
 contract RideHailingAccountManagement {
     RideHailingAccountsDataStorage private accountsDataStorage;
+    RideHailingDisputesDataStorage private disputesDataStorage;
 
-    constructor(RideHailingAccountsDataStorage accountsDataStorageAddress) {
+    constructor(
+        RideHailingAccountsDataStorage accountsDataStorageAddress,
+        RideHailingDisputesDataStorage disputesDataStorageAddress
+    ) {
         accountsDataStorage = accountsDataStorageAddress;
+        disputesDataStorage = disputesDataStorageAddress;
     }
 
     function createAccount(string memory username) external payable {
@@ -31,5 +37,17 @@ contract RideHailingAccountManagement {
         return accountsDataStorage.getAccountBalance(msg.sender);
     }
 
+    function withdrawFunds(uint256 withdrawAmt) external {
+        require(
+            accountsDataStorage.accountIsFunctional(msg.sender),
+            "Minimum deposit not met"
+        );
+        require(
+            disputesDataStorage.hasDispute(msg.sender),
+            "Passenger cannot withdraw funds due to active dispute"
+        );
+
+        accountsDataStorage.withdrawFunds(withdrawAmt, msg.sender);
+    }
     // deleteAccount? but it makes making spam accounts easier, maybe refund only 90% of deposit
 }
