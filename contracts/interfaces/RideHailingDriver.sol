@@ -28,13 +28,36 @@ contract RideHailingDriver {
         vehiclesDataStorage.addVehicle(model, color, license_number);
     }
 
+<<<<<<< HEAD
     function viewRideRequests()
+=======
+    function getRideRequestsNearLocation(
+        string calldata driverLocation
+    )
+>>>>>>> main
         external
         view
         functionalAccountOnly
         returns (RideHailingRidesDataStorage.Ride[] memory)
     {
+<<<<<<< HEAD
         return ridesDataStorage.getIncompleteRidesByLocation();
+=======
+        RideHailingRidesDataStorage.Ride[]
+            memory openRideRequests = ridesDataStorage.getOpenRideRequests();
+        uint256 lastIdx = 2 > openRideRequests.length
+            ? openRideRequests.length
+            : 2; // dummy oracle: get first two rides from list
+        //TODO this should be from a separate oracle contract
+        RideHailingRidesDataStorage.Ride[]
+            memory nearbyOpenRides = new RideHailingRidesDataStorage.Ride[](
+                lastIdx
+            );
+        for (uint256 i = 0; i < lastIdx; i++) {
+            nearbyOpenRides[i] = openRideRequests[i];
+        }
+        return nearbyOpenRides;
+>>>>>>> main
     }
 
     function acceptRideRequest(uint256 rideId) external functionalAccountOnly {
@@ -43,10 +66,38 @@ contract RideHailingDriver {
 
     // cancelRideRequest in case driver accepts accidentally? but passenger must not have accepted on their end (or do without this first to keep things simple)
 
+<<<<<<< HEAD
     function rideCompleted(uint256 rideId) external functionalAccountOnly {
         ridesDataStorage.completeByDriver(rideId, msg.sender);
     }
 
+=======
+    function completeRide(uint256 rideId) external functionalAccountOnly {
+        ridesDataStorage.completeByDriver(rideId, msg.sender);
+    }
+
+    function ratePassenger(
+        uint256 rideId,
+        uint256 score
+    ) external functionalAccountOnly {
+        require(
+            ridesDataStorage.rideCompleted(rideId),
+            "Ride has not been marked as completed"
+        );
+        require(
+            score >= 0 && score <= 10,
+            "Invalid Rating. Rating must be between 0 and 10"
+        );
+        require(
+            ridesDataStorage.getRatingForPassenger(rideId) == 0,
+            "You have rated this passenger previously"
+        );
+        ridesDataStorage.ratePassenger(rideId, score);
+        address passenger = ridesDataStorage.getPassenger(rideId);
+        accountsDataStorage.rateUser(score, passenger);
+    }
+
+>>>>>>> main
     modifier functionalAccountOnly() {
         require(
             accountsDataStorage.accountExists(msg.sender),

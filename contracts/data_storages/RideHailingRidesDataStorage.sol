@@ -11,10 +11,12 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         string start; // lattitude, longitude string
         string destination;
         uint256 fare;
+        bool acceptedByPassenger;
         bool passengerRideCompleted;
         bool driverRideCompleted;
         bool inDispute;
-        bool acceptedByPassenger;
+        uint256 ratingForPassenger;
+        uint256 ratingForDriver;
     }
     uint256 private rideIdCounter = 0;
     mapping(uint256 => Ride) private ridesData;
@@ -35,57 +37,41 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
             false,
             false,
             false,
-            false
+            false,
+            0,
+            0
         );
         return rideIdCounter++;
     }
 
-    function getAllIncompleteRides()
+    function getOpenRideRequests()
         external
         view
         internalContractsOnly
         returns (Ride[] memory)
     {
-        Ride[] memory incompleteRides = new Ride[](rideIdCounter);
-        uint256 counter = 0;
+        // solidity does not support dynamic sized arrays in memory, so we have to calculate the size of the array first
+        uint256 numOpenRideRequests = 0;
         for (uint256 i = 0; i < rideIdCounter; i++) {
-            if (
-                !ridesData[i].passengerRideCompleted &&
-                !ridesData[i].driverRideCompleted
-            ) {
-                incompleteRides[counter] = ridesData[i];
+            if (ridesData[i].driver == address(0)) {
+                numOpenRideRequests++;
             }
         }
-        return incompleteRides;
-    }
-
-    function getIncompleteRidesByLocation()
-        external
-        view
-        internalContractsOnly
-        returns (Ride[] memory)
-    {
-        Ride[] memory allIncompleteRides = this.getAllIncompleteRides();
-        uint256 lastIdx = 2 > allIncompleteRides.length
-            ? allIncompleteRides.length
-            : 2; // dummy: get first two rides from list
-        //TODO Improve dummy
-        Ride[] memory incompleteRides = new Ride[](10);
-        for (uint256 i = 0; i < lastIdx; i++) {
-            incompleteRides[i] = allIncompleteRides[i];
+        Ride[] memory openRides = new Ride[](numOpenRideRequests);
+        uint256 j = 0;
+        for (uint256 i = 0; i < rideIdCounter; i++) {
+            if (ridesData[i].driver == address(0)) {
+                openRides[j] = ridesData[i];
+                j++;
+            }
         }
-        return incompleteRides;
+        return openRides;
     }
 
     function acceptByDriver(
         uint256 rideId,
         address driver
-    )
-        external
-        internalContractsOnly
-        validRideId(rideId)
-        isDriver(rideId, driver)
-    {
+    ) external internalContractsOnly validRideId(rideId) {
         ridesData[rideId].driver = driver;
     }
 
@@ -133,6 +119,22 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         ridesData[rideId].driverRideCompleted = true;
     }
 
+    function rateDriver(
+        uint256 rideId,
+        uint256 score
+    ) external validRideId(rideId) {
+        // require condition in interface
+        ridesData[rideId].ratingForDriver = score;
+    }
+
+    function ratePassenger(
+        uint256 rideId,
+        uint256 score
+    ) external validRideId(rideId) {
+        // require condition in interface
+        ridesData[rideId].ratingForPassenger = score;
+    }
+
     function getFare(
         uint256 rideId
     )
@@ -155,6 +157,38 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         returns (address)
     {
         return ridesData[rideId].driver;
+    }
+
+    function getPassenger(
+        uint256 rideId
+    )
+        external
+        view
+        internalContractsOnly
+        validRideId(rideId)
+        returns (address)
+    {
+        return ridesData[rideId].passenger;
+    }
+
+    function rideCompleted(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (bool) {
+        return
+            ridesData[rideId].passengerRideCompleted &&
+            ridesData[rideId].driverRideCompleted;
+    }
+
+    function getRatingForPassenger(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (uint256) {
+        return ridesData[rideId].ratingForPassenger;
+    }
+
+    function getRatingForDriver(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (uint256) {
+        return ridesData[rideId].ratingForDriver;
     }
 
     modifier isPassenger(uint256 rideId, address passenger) {
