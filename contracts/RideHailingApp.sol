@@ -40,7 +40,8 @@ contract RideHailingApp {
         driverContract = new RideHailingDriver(
             accountsDataStorage,
             ridesDataStorage,
-            vehiclesDataStorage
+            vehiclesDataStorage,
+            oracleInterface
         );
         disputesContract = new RideDispute(
             accountsDataStorage,
