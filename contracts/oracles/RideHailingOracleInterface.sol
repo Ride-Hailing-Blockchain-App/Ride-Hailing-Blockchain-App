@@ -8,11 +8,20 @@ abstract contract RideHailingOracleInterface {
 
     function prevailingWage() public view virtual returns (uint256);
 
-    function estimateRideDuration(string memory start, string memory destination) public virtual returns (uint256);
+    function estimateRideDuration(
+        string memory start,
+        string memory destination
+    ) public virtual returns (uint256);
 
-    function getTravelDistance(string memory start, string memory destination) public virtual returns (uint256);
+    function getTravelDistance(
+        string memory start,
+        string memory destination
+    ) public virtual returns (uint256);
 
-    function getSuggestedFare(string calldata start, string calldata destination) external returns (uint256) {
+    function getSuggestedFare(
+        string calldata start,
+        string calldata destination
+    ) external returns (uint256) {
         uint256 petrolCost = (getTravelDistance(start, destination) *
             AVG_FUEL_CONSUMPTION_PER_100_KM *
             petrolPricePerLitre()) / 100;

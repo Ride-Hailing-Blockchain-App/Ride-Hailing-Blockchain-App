@@ -21,7 +21,6 @@ contract("test_ride_hailing_accounts", function (accounts) {
             accountsInstance.getAccountBalance({ from: accounts[0] }),
             "Account does not exist"
         );
-
     });
 
     it("Create account", async function () {

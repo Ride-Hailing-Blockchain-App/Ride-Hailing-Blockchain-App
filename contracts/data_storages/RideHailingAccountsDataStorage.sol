@@ -43,16 +43,11 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         return accountBalances[accountAddress];
     }
 
-    function getOverallRating(
-        address accountAddress
-    ) external view returns (uint256) {
+    function getOverallRating(address accountAddress) external view returns (uint256) {
         return accounts[accountAddress].overallRating;
     }
 
-    function addBalance(
-        uint256 amount,
-        address accountAddress
-    ) external internalContractsOnly {
+    function addBalance(uint256 amount, address accountAddress) external internalContractsOnly {
         accountBalances[accountAddress] += amount;
     }
 
@@ -68,9 +63,7 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
             accounts[accountAddress].numRatings;
     }
 
-    function reduceRating(
-        address accountAddress
-    ) external internalContractsOnly {
+    function reduceRating(address accountAddress) external internalContractsOnly {
         if (accounts[accountAddress].totalRatingSum < MAX_USER_RATING) {
             // subtract a full star rating
             accounts[accountAddress].totalRatingSum = 0;
@@ -85,23 +78,13 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         }
     }
 
-    function transfer(
-        uint256 amount,
-        address from,
-        address to
-    ) external internalContractsOnly {
-        require(
-            accountBalances[from] >= amount,
-            "Insufficient account balance"
-        );
+    function transfer(uint256 amount, address from, address to) external internalContractsOnly {
+        require(accountBalances[from] >= amount, "Insufficient account balance");
         accountBalances[from] -= amount;
         accountBalances[to] += amount;
     }
 
-    function withdrawFunds(
-        uint256 amount,
-        address user
-    ) external internalContractsOnly {
+    function withdrawFunds(uint256 amount, address user) external internalContractsOnly {
         require(
             accountBalances[user] >= amount + MIN_DEPOSIT_AMOUNT,
             "Insufficient account balance"

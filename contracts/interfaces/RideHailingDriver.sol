@@ -30,22 +30,13 @@ contract RideHailingDriver {
 
     function getRideRequestsNearLocation(
         string calldata driverLocation
-    )
-        external
-        view
-        functionalAccountOnly
-        returns (RideHailingRidesDataStorage.Ride[] memory)
-    {
-        RideHailingRidesDataStorage.Ride[]
-            memory openRideRequests = ridesDataStorage.getOpenRideRequests();
-        uint256 lastIdx = 2 > openRideRequests.length
-            ? openRideRequests.length
-            : 2; // dummy oracle: get first two rides from list
+    ) external view functionalAccountOnly returns (RideHailingRidesDataStorage.Ride[] memory) {
+        RideHailingRidesDataStorage.Ride[] memory openRideRequests = ridesDataStorage
+            .getOpenRideRequests();
+        uint256 lastIdx = 2 > openRideRequests.length ? openRideRequests.length : 2; // dummy oracle: get first two rides from list
         //TODO this should be from a separate oracle contract
         RideHailingRidesDataStorage.Ride[]
-            memory nearbyOpenRides = new RideHailingRidesDataStorage.Ride[](
-                lastIdx
-            );
+            memory nearbyOpenRides = new RideHailingRidesDataStorage.Ride[](lastIdx);
         for (uint256 i = 0; i < lastIdx; i++) {
             nearbyOpenRides[i] = openRideRequests[i];
         }
@@ -62,18 +53,9 @@ contract RideHailingDriver {
         ridesDataStorage.completeByDriver(rideId, msg.sender);
     }
 
-    function ratePassenger(
-        uint256 rideId,
-        uint256 score
-    ) external functionalAccountOnly {
-        require(
-            ridesDataStorage.rideCompleted(rideId),
-            "Ride has not been marked as completed"
-        );
-        require(
-            score >= 0 && score <= 10,
-            "Invalid Rating. Rating must be between 0 and 10"
-        );
+    function ratePassenger(uint256 rideId, uint256 score) external functionalAccountOnly {
+        require(ridesDataStorage.rideCompleted(rideId), "Ride has not been marked as completed");
+        require(score >= 0 && score <= 10, "Invalid Rating. Rating must be between 0 and 10");
         require(
             ridesDataStorage.getRatingForPassenger(rideId) == 0,
             "You have rated this passenger previously"
@@ -84,14 +66,8 @@ contract RideHailingDriver {
     }
 
     modifier functionalAccountOnly() {
-        require(
-            accountsDataStorage.accountExists(msg.sender),
-            "Account does not exist"
-        );
-        require(
-            accountsDataStorage.accountIsFunctional(msg.sender),
-            "Minimum deposit not met"
-        );
+        require(accountsDataStorage.accountExists(msg.sender), "Account does not exist");
+        require(accountsDataStorage.accountIsFunctional(msg.sender), "Minimum deposit not met");
         _;
     }
 }

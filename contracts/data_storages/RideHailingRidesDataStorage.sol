@@ -45,12 +45,7 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         return rideIdCounter++;
     }
 
-    function getOpenRideRequests()
-        external
-        view
-        internalContractsOnly
-        returns (Ride[] memory)
-    {
+    function getOpenRideRequests() external view internalContractsOnly returns (Ride[] memory) {
         // solidity does not support dynamic sized arrays in memory, so we have to calculate the size of the array first
         uint256 numOpenRideRequests = 0;
         for (uint256 i = 0; i < rideIdCounter; i++) {
@@ -79,16 +74,8 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     function acceptByPassenger(
         uint256 rideId,
         address passenger
-    )
-        external
-        internalContractsOnly
-        validRideId(rideId)
-        isPassenger(rideId, passenger)
-    {
-        require(
-            ridesData[rideId].driver != address(0),
-            "Unable to accept ride without driver"
-        );
+    ) external internalContractsOnly validRideId(rideId) isPassenger(rideId, passenger) {
+        require(ridesData[rideId].driver != address(0), "Unable to accept ride without driver");
         ridesData[rideId].acceptedByPassenger = true;
         passengerRides[passenger] = rideId;
     }
@@ -96,12 +83,7 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     function completeByPassenger(
         uint256 rideId,
         address passenger
-    )
-        external
-        internalContractsOnly
-        validRideId(rideId)
-        isPassenger(rideId, passenger)
-    {
+    ) external internalContractsOnly validRideId(rideId) isPassenger(rideId, passenger) {
         require(
             ridesData[rideId].driverRideCompleted == true,
             "Driver must complete the ride first"
@@ -113,73 +95,40 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     function completeByDriver(
         uint256 rideId,
         address driver
-    )
-        external
-        internalContractsOnly
-        validRideId(rideId)
-        isDriver(rideId, driver)
-    {
+    ) external internalContractsOnly validRideId(rideId) isDriver(rideId, driver) {
         ridesData[rideId].driverRideCompleted = true;
     }
 
-    function rateDriver(
-        uint256 rideId,
-        uint256 score
-    ) external validRideId(rideId) {
+    function rateDriver(uint256 rideId, uint256 score) external validRideId(rideId) {
         // require condition in interface
         ridesData[rideId].ratingForDriver = score;
     }
 
-    function ratePassenger(
-        uint256 rideId,
-        uint256 score
-    ) external validRideId(rideId) {
+    function ratePassenger(uint256 rideId, uint256 score) external validRideId(rideId) {
         // require condition in interface
         ridesData[rideId].ratingForPassenger = score;
     }
 
     function getFare(
         uint256 rideId
-    )
-        external
-        view
-        internalContractsOnly
-        validRideId(rideId)
-        returns (uint256)
-    {
+    ) external view internalContractsOnly validRideId(rideId) returns (uint256) {
         return ridesData[rideId].fare;
     }
 
     function getDriver(
         uint256 rideId
-    )
-        external
-        view
-        internalContractsOnly
-        validRideId(rideId)
-        returns (address)
-    {
+    ) external view internalContractsOnly validRideId(rideId) returns (address) {
         return ridesData[rideId].driver;
     }
 
     function getPassenger(
         uint256 rideId
-    )
-        external
-        view
-        internalContractsOnly
-        validRideId(rideId)
-        returns (address)
-    {
+    ) external view internalContractsOnly validRideId(rideId) returns (address) {
         return ridesData[rideId].passenger;
     }
 
-    function rideCompleted(
-        uint256 rideId
-    ) external view validRideId(rideId) returns (bool) {
-        return
-            ridesData[rideId].passengerRideCompleted &&
-            ridesData[rideId].driverRideCompleted;
+    function rideCompleted(uint256 rideId) external view validRideId(rideId) returns (bool) {
+        return ridesData[rideId].passengerRideCompleted && ridesData[rideId].driverRideCompleted;
     }
 
     function getRatingForPassenger(
@@ -199,10 +148,7 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     }
 
     modifier isPassenger(uint256 rideId, address passenger) {
-        require(
-            ridesData[rideId].passenger == passenger,
-            "User is not the passenger"
-        );
+        require(ridesData[rideId].passenger == passenger, "User is not the passenger");
         _;
     }
 

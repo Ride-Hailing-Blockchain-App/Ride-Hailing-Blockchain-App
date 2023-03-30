@@ -18,10 +18,7 @@ contract RideHailingAccountManagement {
 
     function createAccount(string memory username) external payable {
         // TODO emit event
-        require(
-            !accountsDataStorage.accountExists(msg.sender),
-            "Account already exists"
-        );
+        require(!accountsDataStorage.accountExists(msg.sender), "Account already exists");
         require(
             msg.value >= accountsDataStorage.MIN_DEPOSIT_AMOUNT(),
             "Minimum deposit amount not met"
@@ -30,18 +27,12 @@ contract RideHailingAccountManagement {
     }
 
     function getAccountBalance() external view returns (uint256) {
-        require(
-            accountsDataStorage.accountExists(msg.sender),
-            "Account does not exist"
-        );
+        require(accountsDataStorage.accountExists(msg.sender), "Account does not exist");
         return accountsDataStorage.getAccountBalance(msg.sender);
     }
 
     function withdrawFunds(uint256 withdrawAmt) external {
-        require(
-            accountsDataStorage.accountIsFunctional(msg.sender),
-            "Minimum deposit not met"
-        );
+        require(accountsDataStorage.accountIsFunctional(msg.sender), "Minimum deposit not met");
         require(
             disputesDataStorage.hasDispute(msg.sender),
             "Passenger cannot withdraw funds due to active dispute"

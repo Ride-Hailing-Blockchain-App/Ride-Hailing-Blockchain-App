@@ -32,10 +32,21 @@ contract RideHailingApp {
         ridesDataStorage = new RideHailingRidesDataStorage();
         vehiclesDataStorage = new RideHailingVehiclesDataStorage();
         // initialise interface contracts
-        accountsContract = new RideHailingAccountManagement(accountsDataStorage, disputesDataStorage);
+        accountsContract = new RideHailingAccountManagement(
+            accountsDataStorage,
+            disputesDataStorage
+        );
         passengerContract = new RideHailingPassenger(accountsDataStorage, ridesDataStorage);
-        driverContract = new RideHailingDriver(accountsDataStorage, ridesDataStorage, vehiclesDataStorage);
-        disputesContract = new RideDispute(accountsDataStorage, ridesDataStorage, disputesDataStorage);
+        driverContract = new RideHailingDriver(
+            accountsDataStorage,
+            ridesDataStorage,
+            vehiclesDataStorage
+        );
+        disputesContract = new RideDispute(
+            accountsDataStorage,
+            ridesDataStorage,
+            disputesDataStorage
+        );
         address[] memory internalAddresses = new address[](5);
         internalAddresses[0] = address(this);
         internalAddresses[1] = address(accountsContract);

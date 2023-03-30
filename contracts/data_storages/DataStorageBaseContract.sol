@@ -5,9 +5,7 @@ contract DataStorageBaseContract {
     address private ownerContract = msg.sender;
     address[] internalContracts;
 
-    function setInternalContractAddresses(
-        address[] calldata contractAddresses
-    ) external ownerOnly {
+    function setInternalContractAddresses(address[] calldata contractAddresses) external ownerOnly {
         internalContracts = contractAddresses;
     }
 

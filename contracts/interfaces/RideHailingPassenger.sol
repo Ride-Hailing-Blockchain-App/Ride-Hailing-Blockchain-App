@@ -31,12 +31,7 @@ contract RideHailingPassenger {
             ridesDataStorage.hasCurrentRide(msg.sender) == false,
             "Passenger cannot request ride as previous ride has not been completed"
         );
-        ridesDataStorage.createRide(
-            msg.sender,
-            startLocation,
-            destination,
-            bidAmount
-        );
+        ridesDataStorage.createRide(msg.sender, startLocation, destination, bidAmount);
         accountsDataStorage.addBalance(msg.value, msg.sender);
     }
 
@@ -49,27 +44,15 @@ contract RideHailingPassenger {
     function completeRide(uint256 rideId) external functionalAccountOnly {
         uint256 fare = ridesDataStorage.getFare(rideId);
         address driver = ridesDataStorage.getDriver(rideId);
-        require(
-            accountsDataStorage.getAccountBalance(msg.sender) >= fare,
-            "Insufficient value"
-        );
+        require(accountsDataStorage.getAccountBalance(msg.sender) >= fare, "Insufficient value");
         ridesDataStorage.completeByPassenger(rideId, msg.sender);
         accountsDataStorage.transfer(fare, msg.sender, driver); // driver must complete first
     }
 
-    function rateDriver(
-        uint256 rideId,
-        uint256 score
-    ) external functionalAccountOnly {
-        require(
-            ridesDataStorage.rideCompleted(rideId),
-            "Ride has not been marked as completed"
-        );
+    function rateDriver(uint256 rideId, uint256 score) external functionalAccountOnly {
+        require(ridesDataStorage.rideCompleted(rideId), "Ride has not been marked as completed");
 
-        require(
-            score >= 0 && score <= 10,
-            "Invalid Rating. Rating must be between 0 and 5"
-        );
+        require(score >= 0 && score <= 10, "Invalid Rating. Rating must be between 0 and 5");
         require(
             ridesDataStorage.getRatingForDriver(rideId) == 0,
             "You have rated this driver previously"
@@ -80,14 +63,8 @@ contract RideHailingPassenger {
     }
 
     modifier functionalAccountOnly() {
-        require(
-            accountsDataStorage.accountExists(msg.sender),
-            "Account does not exist"
-        );
-        require(
-            accountsDataStorage.accountIsFunctional(msg.sender),
-            "Minimum deposit not met"
-        );
+        require(accountsDataStorage.accountExists(msg.sender), "Account does not exist");
+        require(accountsDataStorage.accountIsFunctional(msg.sender), "Minimum deposit not met");
         _;
     }
 }

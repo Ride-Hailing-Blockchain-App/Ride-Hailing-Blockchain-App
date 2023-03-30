@@ -24,53 +24,28 @@ contract RideDispute {
         MIN_DEPOSIT_AMOUNT = accountsDataStorage.MIN_DEPOSIT_AMOUNT();
     }
 
-    function createDispute(
-        address defendant,
-        string calldata description
-    ) external {
+    function createDispute(address defendant, string calldata description) external {
         // TODO should we also check that the defendant is in one of the plantiff's ride history?
         require(
-            accountsDataStorage.getAccountBalance(msg.sender) >=
-                MIN_DEPOSIT_AMOUNT,
+            accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DEPOSIT_AMOUNT,
             "Account does not have enough deposit to create a dispute"
         );
-        require(
-            defendant != msg.sender,
-            "You cannot make a dispute with yourself!"
-        );
+        require(defendant != msg.sender, "You cannot make a dispute with yourself!");
         disputesDataStorage.createDispute(msg.sender, defendant, description);
         //disputeDataStorage will hold the deposits, note that this disables the account until the deposit is topped up again
-        accountsDataStorage.transfer(
-            MIN_DEPOSIT_AMOUNT,
-            msg.sender,
-            address(this)
-        );
+        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(this));
     }
 
-    function respondDispute(
-        uint256 disputeId,
-        string calldata replyDescription
-    ) external {
-        require(
-            disputesDataStorage.checkDisputeExist(disputeId) == true,
-            "No such dispute exist!"
-        );
+    function respondDispute(uint256 disputeId, string calldata replyDescription) external {
+        require(disputesDataStorage.checkDisputeExist(disputeId) == true, "No such dispute exist!");
         address defendant = disputesDataStorage.getDefendant(disputeId);
+        require(msg.sender == defendant, "You are not the dispute's defendant!");
         require(
-            msg.sender == defendant,
-            "You are not the dispute's defendant!"
-        );
-        require(
-            accountsDataStorage.getAccountBalance(msg.sender) >=
-                MIN_DEPOSIT_AMOUNT,
+            accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DEPOSIT_AMOUNT,
             "Account does not have enough deposit to respond a dispute"
         );
         disputesDataStorage.setDefenseDescription(disputeId, replyDescription);
-        accountsDataStorage.transfer(
-            MIN_DEPOSIT_AMOUNT,
-            msg.sender,
-            address(this)
-        ); //disputeDataStorage will hold the deposit from the plaintiff
+        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(this)); //disputeDataStorage will hold the deposit from the plaintiff
     }
 
     function voteDispute(uint256 disputeId, uint256 disputer) external {
@@ -86,14 +61,8 @@ contract RideDispute {
         );
 
         // 1 = plaintiff, 2 = defendant
-        require(
-            disputer == 1 || disputer == 2,
-            "Please input correct number to vote for!"
-        );
-        require(
-            disputesDataStorage.checkDisputeExist(disputeId) == true,
-            "No such dispute exist!"
-        );
+        require(disputer == 1 || disputer == 2, "Please input correct number to vote for!");
+        require(disputesDataStorage.checkDisputeExist(disputeId) == true, "No such dispute exist!");
         if (disputer == 1) {
             disputesDataStorage.increasePlaintiffVotes(disputeId, msg.sender); //must add msg.sender to voterlist to avoid repeated votes
         } else {
@@ -111,12 +80,8 @@ contract RideDispute {
     }
 
     function endVote(uint256 disputeId) external {
-        uint256 plaintiffVotes = disputesDataStorage.getPlaintiffVotes(
-            disputeId
-        );
-        uint256 defendantVotes = disputesDataStorage.getDefendantVotes(
-            disputeId
-        );
+        uint256 plaintiffVotes = disputesDataStorage.getPlaintiffVotes(disputeId);
+        uint256 defendantVotes = disputesDataStorage.getDefendantVotes(disputeId);
         uint256 totalVotes = plaintiffVotes + defendantVotes;
         address[] memory winners = new address[](0);
 
@@ -157,11 +122,7 @@ contract RideDispute {
 
         uint256 winnerPrize = MIN_DEPOSIT_AMOUNT / winners.length;
         for (uint256 i = 0; i < winners.length; i++) {
-            accountsDataStorage.transfer(
-                winnerPrize,
-                address(this),
-                winners[i]
-            );
+            accountsDataStorage.transfer(winnerPrize, address(this), winners[i]);
         }
     }
 

@@ -84,15 +84,11 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].defendantVotes;
     }
 
-    function getDefendant(
-        uint256 disputeId
-    ) external view internalContractsOnly returns (address) {
+    function getDefendant(uint256 disputeId) external view internalContractsOnly returns (address) {
         return disputeData[disputeId].defendant;
     }
 
-    function getPlaintiff(
-        uint256 disputeId
-    ) external view internalContractsOnly returns (address) {
+    function getPlaintiff(uint256 disputeId) external view internalContractsOnly returns (address) {
         return disputeData[disputeId].plaintiff;
     }
 
@@ -113,22 +109,15 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint8[] memory voterChoiceFinal = disputeData[disputeId].voterChoice;
         for (uint256 i = 0; i <= voterChoiceFinal.length; i++) {
             if (voterChoiceFinal[i] == winner) {
-                disputeData[disputeId].voteWinners.push(
-                    disputeData[disputeId].voterList[i]
-                );
+                disputeData[disputeId].voteWinners.push(disputeData[disputeId].voterList[i]);
             }
         }
         return disputeData[disputeId].voteWinners;
     }
 
-    function hasDispute(
-        address user
-    ) external view internalContractsOnly returns (bool) {
+    function hasDispute(address user) external view internalContractsOnly returns (bool) {
         for (uint256 i = 0; i <= disputeData.length; i++) {
-            if (
-                disputeData[i].plaintiff == user ||
-                disputeData[i].defendant == user
-            ) {
+            if (disputeData[i].plaintiff == user || disputeData[i].defendant == user) {
                 return true;
             }
         }

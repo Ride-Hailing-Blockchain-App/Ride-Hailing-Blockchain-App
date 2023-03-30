@@ -16,7 +16,10 @@ contract DummyOracle is RideHailingOracleInterface {
         return 4400000000000000; // about 8 USD
     }
 
-    function estimateRideDuration(string memory, string memory) public pure override returns (uint256) {
+    function estimateRideDuration(
+        string memory,
+        string memory
+    ) public pure override returns (uint256) {
         return 1;
     }
 
@@ -30,7 +33,10 @@ contract DummyOracle is RideHailingOracleInterface {
         string calldata, //location
         uint256 numPointsToReturn
     ) external override returns (string[] memory) {
-        require(numPointsToReturn <= points.length, "numPointsToReturn should be less than size of points");
+        require(
+            numPointsToReturn <= points.length,
+            "numPointsToReturn should be less than size of points"
+        );
         string[] memory closestPoints = new string[](numPointsToReturn);
         for (uint8 i = 0; i < numPointsToReturn; i++) {
             closestPoints[i] = points[closestPointsPointer % points.length];
