@@ -7,6 +7,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     struct Dispute {
         address plaintiff;
         address defendant;
+        uint rideId;
         string complaintDescription;
         string defenseDescription;
         bool resolved;
@@ -21,13 +22,15 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     function createDispute(
         address plaintiff,
         address defendant,
-        string calldata complaintDescription
+        string calldata complaintDescription,
+        uint rideId
     ) external internalContractsOnly returns (uint256) {
         uint256 disputeId = disputeData.length;
         disputeData.push(
             Dispute(
                 plaintiff,
                 defendant,
+                rideId,
                 complaintDescription,
                 "",
                 false,
@@ -46,6 +49,12 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     ) external view internalContractsOnly returns (Dispute memory) {
         return disputeData[disputeId];
     }
+
+    function getRideId(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (uint) {
+        return disputeData[disputeId].rideId;
+    } 
 
     function setDefenseDescription(
         uint256 disputeId,
@@ -90,6 +99,20 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
 
     function getPlaintiff(uint256 disputeId) external view internalContractsOnly returns (address) {
         return disputeData[disputeId].plaintiff;
+    }
+
+    function checkAlreadyVoted(
+        uint256 disputeId,
+        address voterAddress
+    ) external view internalContractsOnly returns (bool) {
+        bool found = false;
+        for(uint256 i = 0; i < disputeData[disputeId].voterList.length; i++) {
+            if(disputeData[disputeId].voterList[i] == voterAddress) {
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     function checkDisputeExist(

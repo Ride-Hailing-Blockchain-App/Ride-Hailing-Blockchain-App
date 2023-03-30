@@ -11,7 +11,9 @@ contract RideDispute {
     RideHailingDisputesDataStorage private disputesDataStorage;
 
     uint public MIN_DEPOSIT_AMOUNT;
+    uint public TRANSFER_AMOUNT = 5000000000000000; //included in the MIN_DEPOSIT_AMOUNT
     uint public constant MAX_VOTES = 50; //One disputes can only have a max of 50 votes before it automatically closes
+    uint256 public MIN_VOTES_REQUIRED = 20;
 
     constructor(
         RideHailingAccountsDataStorage accountsDataStorageAddress,
@@ -24,14 +26,25 @@ contract RideDispute {
         MIN_DEPOSIT_AMOUNT = accountsDataStorage.MIN_DEPOSIT_AMOUNT();
     }
 
-    function createDispute(address defendant, string calldata description) external {
+    function createDispute(address defendant, string calldata description, uint rideId) external {
         // TODO should we also check that the defendant is in one of the plantiff's ride history?
+        
+        require(
+            ridesDataStorage.getDriver(rideId) == msg.sender || ridesDataStorage.getPassenger(rideId) == msg.sender,
+            "This ride does not belong to you!"
+        );
+
+        require(
+            ridesDataStorage.getDriver(rideId) == defendant || ridesDataStorage.getPassenger(rideId) == defendant,
+            "This defendant is not in one of your rides!"
+        );
+
         require(
             accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DEPOSIT_AMOUNT,
             "Account does not have enough deposit to create a dispute"
         );
         require(defendant != msg.sender, "You cannot make a dispute with yourself!");
-        disputesDataStorage.createDispute(msg.sender, defendant, description);
+        disputesDataStorage.createDispute(msg.sender, defendant, description, rideId);
         //disputeDataStorage will hold the deposits, note that this disables the account until the deposit is topped up again
         accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(this));
     }
@@ -60,6 +73,11 @@ contract RideDispute {
             "You need a minimum overall rating of 3 to vote"
         );
 
+        require(
+            disputesDataStorage.checkAlreadyVoted(disputeId, msg.sender) == false, 
+            "You have already voted!"
+        );
+
         // 1 = plaintiff, 2 = defendant
         require(disputer == 1 || disputer == 2, "Please input correct number to vote for!");
         require(disputesDataStorage.checkDisputeExist(disputeId) == true, "No such dispute exist!");
@@ -86,11 +104,11 @@ contract RideDispute {
         address[] memory winners = new address[](0);
 
         // TODO check floating point here, ie. 4/5 might be 0 due to casting to uint
-        if (plaintiffVotes >= ((totalVotes * 3) / 5)) {
+        if (plaintiffVotes >= ((totalVotes * 3) / 5) && totalVotes >= MIN_VOTES_REQUIRED) {
             // plaintiff wins if 60 percent or more belongs to plaintiff
             winners = disputesDataStorage.won(disputeId, 1);
             accountsDataStorage.transfer(
-                MIN_DEPOSIT_AMOUNT,
+                MIN_DEPOSIT_AMOUNT + TRANSFER_AMOUNT, //transfer to plaintiff the amount he deposited plus the transfer amount from defendant
                 address(this),
                 disputesDataStorage.getPlaintiff(disputeId)
             );
@@ -98,16 +116,19 @@ contract RideDispute {
             reduceLoserRating(disputesDataStorage.getPlaintiff(disputeId));
 
             //need to transfer ride fee as well
-        } else if (defendantVotes >= ((totalVotes * 3) / 5)) {
+        } else if (defendantVotes >= ((totalVotes * 3) / 5) && totalVotes >= MIN_VOTES_REQUIRED) {
             winners = disputesDataStorage.won(disputeId, 2);
             accountsDataStorage.transfer(
-                MIN_DEPOSIT_AMOUNT,
+                MIN_DEPOSIT_AMOUNT + TRANSFER_AMOUNT,
                 address(this),
                 disputesDataStorage.getDefendant(disputeId)
             );
 
             reduceLoserRating(disputesDataStorage.getDefendant(disputeId));
-        } else {
+        } else { 
+            //indeterminate dispute (ie. no outcome)
+            //Just transfer deposited amount to defendant and plaintiff
+            //voters get nothing back
             accountsDataStorage.transfer(
                 MIN_DEPOSIT_AMOUNT,
                 address(this),
@@ -120,7 +141,7 @@ contract RideDispute {
             );
         }
 
-        uint256 winnerPrize = MIN_DEPOSIT_AMOUNT / winners.length;
+        uint256 winnerPrize = (MIN_DEPOSIT_AMOUNT - TRANSFER_AMOUNT) / winners.length; //transfer remaining amount minus the transfer amount to the correct voters
         for (uint256 i = 0; i < winners.length; i++) {
             accountsDataStorage.transfer(winnerPrize, address(this), winners[i]);
         }
