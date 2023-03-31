@@ -16,6 +16,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         address[] voterList; //only one person can vote once
         uint8[] voterChoice;
         address[] voteWinners;
+        uint256 startTime;
     }
     Dispute[] private disputeData;
 
@@ -38,7 +39,8 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 0,
                 new address[](0),
                 new uint8[](0),
-                new address[](0)
+                new address[](0),
+                block.timestamp
             )
         );
         return disputeId;
@@ -55,6 +57,15 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     ) external view internalContractsOnly returns (uint) {
         return disputeData[disputeId].rideId;
     } 
+
+    function getTimeRemaining(uint256 disputeId) external view internalContractsOnly returns (uint256) {
+        uint256 timePassed = block.timestamp - disputeData[disputeId].startTime;
+        if(timePassed >= 1 days) {
+            return 0;
+        } else {
+            return 1 days - timePassed;
+        }
+    }
 
     function setDefenseDescription(
         uint256 disputeId,
