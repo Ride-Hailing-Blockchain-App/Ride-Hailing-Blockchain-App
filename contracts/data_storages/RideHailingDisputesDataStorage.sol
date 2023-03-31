@@ -67,6 +67,24 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         }
     }
 
+
+    function generateDisputeForVoting() external view returns (uint256) {
+        // dummy oracle : get unresolved dispute by rng
+        for (uint256 i = 0; i < disputeData.length; i++) {
+            if (disputeData[i].resolved != true) {
+                return i; // i is the disputeId
+            }
+        }
+        // returns max uint256 value if no unresolved dispute found
+        return (2 ^ (256 - 1));
+    }
+
+    function checkDisputeStatus(
+        uint256 disputeId
+    ) external view returns (bool) {
+        return disputeData[disputeId].resolved;
+    }
+
     function setDefenseDescription(
         uint256 disputeId,
         string calldata defenseDescription
@@ -156,5 +174,13 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
             }
         }
         return false;
+    }
+
+    function setDisputeResolved(uint256 disputeId) external internalContractsOnly {
+        disputeData[disputeId].resolved = true;
+    }
+
+    function getDisputeResolve(uint256 disputeId) external view internalContractsOnly returns (bool) {
+        return disputeData[disputeId].resolved;
     }
 }
