@@ -35,7 +35,7 @@ contract RideHailingPassenger {
         accountsDataStorage.addBalance(msg.value, msg.sender);
     }
 
-    // editRide
+    // editRide?
 
     function acceptDriver(uint256 rideId) external functionalAccountOnly {
         ridesDataStorage.acceptByPassenger(rideId, msg.sender);
