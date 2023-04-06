@@ -10,8 +10,9 @@ contract RideDispute {
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingDisputesDataStorage private disputesDataStorage;
 
-    uint public MIN_DEPOSIT_AMOUNT;
-    uint public TRANSFER_AMOUNT = 5000000000000000; //included in the MIN_DEPOSIT_AMOUNT
+    uint public MIN_DISPUTE_AMOUNT = 2000000000000000 ;
+    uint public TRANSFER_AMOUNT = 500000000000000; //included in the MIN_DISPUTE_AMOUNT
+    uint public VOTER_DEPOSIT_AMOUNT = 100000000000000; //Whenever a voter vote, must deposit this amount
     uint public constant MAX_VOTES = 50; //One disputes can only have a max of 50 votes before it automatically closes
     uint256 public MIN_VOTES_REQUIRED = 20;
 
@@ -23,7 +24,6 @@ contract RideDispute {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = rideDataStorageAddress;
         disputesDataStorage = disputesDataStorageAddress;
-        MIN_DEPOSIT_AMOUNT = accountsDataStorage.MIN_DEPOSIT_AMOUNT();
     }
 
     function createDispute(address defendant, string calldata description, uint rideId) external {
@@ -40,13 +40,13 @@ contract RideDispute {
         );
 
         require(
-            accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DEPOSIT_AMOUNT,
+            accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DISPUTE_AMOUNT,
             "Account does not have enough deposit to create a dispute"
         );
         require(defendant != msg.sender, "You cannot make a dispute with yourself!");
         disputesDataStorage.createDispute(msg.sender, defendant, description, rideId);
         //disputeDataStorage will hold the deposits, note that this disables the account until the deposit is topped up again
-        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(this));
+        accountsDataStorage.transfer(MIN_DISPUTE_AMOUNT, msg.sender, address(this));
     }
 
     function respondDispute(uint256 disputeId, string calldata replyDescription) external {
@@ -54,11 +54,19 @@ contract RideDispute {
         address defendant = disputesDataStorage.getDefendant(disputeId);
         require(msg.sender == defendant, "You are not the dispute's defendant!");
         require(
-            accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DEPOSIT_AMOUNT,
+            accountsDataStorage.getAccountBalance(msg.sender) >= MIN_DISPUTE_AMOUNT,
             "Account does not have enough deposit to respond a dispute"
         );
         disputesDataStorage.setDefenseDescription(disputeId, replyDescription);
-        accountsDataStorage.transfer(MIN_DEPOSIT_AMOUNT, msg.sender, address(this)); //disputeDataStorage will hold the deposit from the plaintiff
+        accountsDataStorage.transfer(MIN_DISPUTE_AMOUNT, msg.sender, address(this)); //disputeDataStorage will hold the deposit from the plaintiff
+    }
+
+    function checkLoanExpiry(uint256 disputeId) external {
+        require(disputesDataStorage.checkDisputeExist(disputeId) == true, "No such dispute exist!");
+
+        if (disputesDataStorage.getTimeRemaining(disputeId) == 0) { // passed 24 hour mark
+            this.endVote(disputeId);
+        }
     }
 
     function voteDispute(uint256 disputeId, uint256 disputer) external {
@@ -71,6 +79,11 @@ contract RideDispute {
         require(
             accountsDataStorage.getOverallRating(msg.sender) >= 3,
             "You need a minimum overall rating of 3 to vote"
+        );
+
+        require(
+            accountsDataStorage.getAccountBalance(msg.sender) >= VOTER_DEPOSIT_AMOUNT,
+            "You do not have enough balance to vote!"
         );
 
         require(
@@ -87,6 +100,9 @@ contract RideDispute {
             disputesDataStorage.increaseDefendantVotes(disputeId, msg.sender);
         }
 
+        accountsDataStorage.transfer(VOTER_DEPOSIT_AMOUNT, msg.sender, address(this)); //transfer voter deposit to this contract
+        disputesDataStorage.recordVoterDeposit(disputeId, VOTER_DEPOSIT_AMOUNT);
+
         //when total vote count reaches the max
         if (
             disputesDataStorage.getDefendantVotes(disputeId) +
@@ -98,28 +114,28 @@ contract RideDispute {
     }
 
     function endVote(uint256 disputeId) external {
+        require(disputesDataStorage.getDisputeResolve(disputeId) == false, "This dispute has already been resolved!");
+
         uint256 plaintiffVotes = disputesDataStorage.getPlaintiffVotes(disputeId);
         uint256 defendantVotes = disputesDataStorage.getDefendantVotes(disputeId);
         uint256 totalVotes = plaintiffVotes + defendantVotes;
         address[] memory winners = new address[](0);
 
         // TODO check floating point here, ie. 4/5 might be 0 due to casting to uint
-        if (plaintiffVotes >= ((totalVotes * 3) / 5) && totalVotes >= MIN_VOTES_REQUIRED) {
+        if (plaintiffVotes >= (totalVotes * 60 / 100) && totalVotes >= MIN_VOTES_REQUIRED) {
             // plaintiff wins if 60 percent or more belongs to plaintiff
             winners = disputesDataStorage.won(disputeId, 1);
             accountsDataStorage.transfer(
-                MIN_DEPOSIT_AMOUNT + TRANSFER_AMOUNT, //transfer to plaintiff the amount he deposited plus the transfer amount from defendant
+                MIN_DISPUTE_AMOUNT + TRANSFER_AMOUNT, //transfer to plaintiff the amount he deposited plus the transfer amount from defendant
                 address(this),
                 disputesDataStorage.getPlaintiff(disputeId)
             );
+            reduceLoserRating(disputesDataStorage.getPlaintiff(disputeId)); 
 
-            reduceLoserRating(disputesDataStorage.getPlaintiff(disputeId));
-
-            //need to transfer ride fee as well
-        } else if (defendantVotes >= ((totalVotes * 3) / 5) && totalVotes >= MIN_VOTES_REQUIRED) {
+        } else if (defendantVotes >= (totalVotes * 60 / 100) && totalVotes >= MIN_VOTES_REQUIRED) {
             winners = disputesDataStorage.won(disputeId, 2);
             accountsDataStorage.transfer(
-                MIN_DEPOSIT_AMOUNT + TRANSFER_AMOUNT,
+                MIN_DISPUTE_AMOUNT + TRANSFER_AMOUNT,
                 address(this),
                 disputesDataStorage.getDefendant(disputeId)
             );
@@ -130,21 +146,30 @@ contract RideDispute {
             //Just transfer deposited amount to defendant and plaintiff
             //voters get nothing back
             accountsDataStorage.transfer(
-                MIN_DEPOSIT_AMOUNT,
+                MIN_DISPUTE_AMOUNT,
                 address(this),
                 disputesDataStorage.getDefendant(disputeId)
             );
             accountsDataStorage.transfer(
-                MIN_DEPOSIT_AMOUNT,
+                MIN_DISPUTE_AMOUNT,
                 address(this),
                 disputesDataStorage.getPlaintiff(disputeId)
             );
+            uint [] memory voterDeposits  = disputesDataStorage.getAllVoterDeposit(disputeId);
+            address [] memory voters = disputesDataStorage.getAllVoters(disputeId);
+
+            for (uint i = 0; i < voters.length ; i++) {
+                accountsDataStorage.transfer(voterDeposits[i], address(this), voters[i]); //transfer voter deposits back to individual voters
+            }
         }
 
-        uint256 winnerPrize = (MIN_DEPOSIT_AMOUNT - TRANSFER_AMOUNT) / winners.length; //transfer remaining amount minus the transfer amount to the correct voters
+        uint totalVoterDepositAmount = disputesDataStorage.getTotalVoterDeposit(disputeId);
+        uint256 winnerPrize = (MIN_DISPUTE_AMOUNT - TRANSFER_AMOUNT + totalVoterDepositAmount) / winners.length; //transfer remaining amount minus the transfer amount to the correct voters
         for (uint256 i = 0; i < winners.length; i++) {
             accountsDataStorage.transfer(winnerPrize, address(this), winners[i]);
         }
+
+        disputesDataStorage.setDisputeResolved(disputeId); // will set the dispute as resolved regardless of outcome
     }
 
     function reduceLoserRating(address loserAddress) internal {
