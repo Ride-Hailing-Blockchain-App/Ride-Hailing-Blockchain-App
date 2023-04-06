@@ -28,8 +28,8 @@ contract RideHailingDriver {
         string calldata model,
         string calldata color,
         string calldata license_number
-    ) external payable functionalAccountOnly {
-        vehiclesDataStorage.addVehicle(model, color, license_number);
+    ) external payable functionalAccountOnly returns (uint256) {
+        return vehiclesDataStorage.addVehicle(model, color, license_number);
     }
 
     function getRideRequestsNearLocation(
