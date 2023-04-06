@@ -10,6 +10,8 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint rideId;
         string complaintDescription;
         string defenseDescription;
+        bool carFeeDispute;
+        bool compensationDispute;
         bool resolved;
         uint256 plaintiffVotes;
         uint256 defendantVotes;
@@ -25,7 +27,9 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         address plaintiff,
         address defendant,
         string calldata complaintDescription,
-        uint rideId
+        uint rideId,
+        bool carFeeDispute,
+        bool compensationDispute
     ) external internalContractsOnly returns (uint256) {
         uint256 disputeId = disputeData.length;
         disputeData.push(
@@ -35,6 +39,8 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 rideId,
                 complaintDescription,
                 "",
+                carFeeDispute,
+                compensationDispute,
                 false,
                 0,
                 0,
@@ -140,6 +146,18 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint256 disputeId
     ) external view internalContractsOnly returns (address [] memory) {
         return disputeData[disputeId].voterList;
+    }
+
+    function getCarFeeDispute(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (bool) {
+        return disputeData[disputeId].carFeeDispute;
+    }
+
+    function getCompensationDispute (
+        uint256 disputeId
+    ) external view internalContractsOnly returns (bool) {
+        return disputeData[disputeId].compensationDispute;
     }
 
     function getPlaintiffVotes(

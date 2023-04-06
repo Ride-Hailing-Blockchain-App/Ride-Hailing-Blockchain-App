@@ -46,7 +46,8 @@ contract RideHailingApp {
         disputesContract = new RideDispute(
             accountsDataStorage,
             ridesDataStorage,
-            disputesDataStorage
+            disputesDataStorage,
+            passengerContract
         );
         address[] memory internalAddresses = new address[](5);
         internalAddresses[0] = address(this);
