@@ -32,7 +32,7 @@ contract RideHailingPassenger {
             "Passenger cannot request ride as previous ride has not been completed"
         );
         ridesDataStorage.createRide(msg.sender, startLocation, destination, bidAmount);
-        accountsDataStorage.addBalance(msg.value, msg.sender);
+        accountsDataStorage.addBalance(msg.value, address(this));
     }
 
     // editRide?
@@ -42,11 +42,7 @@ contract RideHailingPassenger {
     }
 
     function completeRide(uint256 rideId) external functionalAccountOnly {
-        uint256 fare = ridesDataStorage.getFare(rideId);
-        address driver = ridesDataStorage.getDriver(rideId);
-        require(accountsDataStorage.getAccountBalance(msg.sender) >= fare, "Insufficient value");
         ridesDataStorage.completeByPassenger(rideId, msg.sender);
-        accountsDataStorage.transfer(fare, msg.sender, driver); // driver must complete first
     }
 
     function rateDriver(uint256 rideId, uint256 score) external functionalAccountOnly {
