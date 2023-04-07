@@ -58,12 +58,8 @@ contract("RideHailingDriver", (accounts) => {
     await driverContractInstance.acceptRideRequest(1, {
       from: driverAccount,
     });
-    // const driver = await ridesDataStorage.getDriver(1);
-    // await assert.strictEqual(
-    //   driver,
-    //   driverContractInstance.address,
-    //   "Driver not set to driverContract"
-    // );
+    const driver = await driverContractInstance.getDriver(1);
+    await assert.strictEqual(driver, driverAccount, "Driver not set to driverContract");
   });
 
   it("should not allow driver to accept a ride that is invalid", async () => {
@@ -93,51 +89,51 @@ contract("RideHailingDriver", (accounts) => {
     );
   });
 
-  // it("should allow driver to complete a ride successfully", async () => {
-  //   await driverContractInstance.completeRide(1, {
-  //     from: driverAccount,
-  //   });
+  it("should allow driver to complete a ride successfully", async () => {
+    const initialBalance = new BigNumber(
+      await accountsInstance.getAccountBalance({ from: driverAccount })
+    );
 
-  //   await passengerContractInstance.completeRide(1, {
-  //     from: passengerAccount,
-  //   });
+    await passengerContractInstance.completeRide(1, {
+      from: passengerAccount,
+    });
+    await driverContractInstance.completeRide(1, {
+      from: driverAccount,
+    });
 
-  //   const completed = await ridesDataStorage.rideCompleted(1);
-  //   await assert.strictEqual(completed, true, "Ride not completed");
-  // });
+    const newBalance = new BigNumber(
+      await accountsInstance.getAccountBalance({ from: driverAccount })
+    );
 
-  // it("should not allow driver to rate a passenger with an invalid score (>10)", async () => {
-  //   await truffleAssert.reverts(
-  //     driverContractInstance.ratePassenger(1, 11, {
-  //       from: driverAccount,
-  //     }),
-  //     "Invalid Rating. Rating must be between 0 and 10"
-  //   );
-  // });
+    const completed = await driverContractInstance.checkIfRideCompleted(1);
+    await assert.strictEqual(completed, true, "Ride not completed");
 
-  // it("should not allow driver to rate a passenger with an invalid score (<0)", async () => {
-  //   await truffleAssert.reverts(
-  //     driverContractInstance.ratePassenger(1, -1, {
-  //       from: driverAccount,
-  //     }),
-  //     "Invalid Rating. Rating must be between 0 and 10"
-  //   );
-  // });
+    assert(newBalance.isEqualTo(initialBalance.plus(oneEth)));
+  });
 
-  // it("should allow driver to rate a passenger", async () => {
-  //   await driverContractInstance.ratePassenger(1, 5, {
-  //     from: driverAccount,
-  //   });
-  //   const rating = new BigNumber(await ridesDataStorage.getRatingForPassenger(1));
-  //   await assert.strictEqual(rating, new BigNumber(5), "Rating for passenger not working");
-  // });
+  it("should not allow driver to rate a passenger with an invalid score", async () => {
+    await truffleAssert.reverts(
+      driverContractInstance.ratePassenger(1, 11, {
+        from: driverAccount,
+      }),
+      "Invalid Rating. Rating must be between 0 and 10"
+    );
+  });
 
-  // it("should not allow driver to rate a passenger twice", async () => {
-  //   await truffleAssert.reverts(
-  //     driverContractInstance.ratePassenger(1, 3, {
-  //       from: driverAccount,
-  //     }),
-  //     "You have rated this passenger previously"
-  //   );
-  // });
+  it("should allow driver to rate a passenger", async () => {
+    await driverContractInstance.ratePassenger(1, 5, {
+      from: driverAccount,
+    });
+    const rating = new BigNumber(await driverContractInstance.getRatingForPassenger(1));
+    assert(rating.isEqualTo(new BigNumber(5)), "Rating for passenger not working");
+  });
+
+  it("should not allow driver to rate a passenger twice", async () => {
+    await truffleAssert.reverts(
+      driverContractInstance.ratePassenger(1, 3, {
+        from: driverAccount,
+      }),
+      "You have rated this passenger previously"
+    );
+  });
 });
