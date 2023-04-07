@@ -14,6 +14,7 @@ contract RideHailingPassenger {
     ) {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
+        ridesDataStorage.setPassengerContract(address(this));
     }
 
     function requestRide(

@@ -81,13 +81,13 @@ contract RideHailingDriver {
 
     function completeRide(uint256 rideId) external functionalAccountOnly {
         uint256 fare = ridesDataStorage.getFare(rideId);
-        address passenger = ridesDataStorage.getPassenger(rideId);
+        address passengerContract = ridesDataStorage.getPassengerContract();
         require(
-            accountsDataStorage.getAccountBalance(passenger) >= fare,
-            "Passenger has insufficient value"
+            accountsDataStorage.getAccountBalance(passengerContract) >= fare,
+            "Passenger contract has insufficient value"
         );
         ridesDataStorage.completeByDriver(rideId, msg.sender);
-        accountsDataStorage.transfer(fare, passenger, msg.sender); // passenger must complete first
+        accountsDataStorage.transfer(fare, passengerContract, msg.sender);
     }
 
     function ratePassenger(uint256 rideId, uint256 score) external functionalAccountOnly {
@@ -100,6 +100,22 @@ contract RideHailingDriver {
         ridesDataStorage.ratePassenger(rideId, score);
         address passenger = ridesDataStorage.getPassenger(rideId);
         accountsDataStorage.rateUser(score, passenger);
+    }
+
+    function getDriver(uint256 rideId) external view functionalAccountOnly returns (address) {
+        return ridesDataStorage.getDriver(rideId);
+    }
+
+    function checkIfRideCompleted(
+        uint256 rideId
+    ) external view functionalAccountOnly returns (bool) {
+        return ridesDataStorage.rideCompleted(rideId);
+    }
+
+    function getRatingForPassenger(
+        uint256 rideId
+    ) external view functionalAccountOnly returns (uint256) {
+        return ridesDataStorage.getRatingForPassenger(rideId);
     }
 
     modifier functionalAccountOnly() {
