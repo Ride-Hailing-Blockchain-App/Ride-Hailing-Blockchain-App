@@ -80,7 +80,14 @@ contract RideHailingDriver {
     // cancelRideRequest in case driver accepts accidentally? but passenger must not have accepted on their end (or do without this first to keep things simple)
 
     function completeRide(uint256 rideId) external functionalAccountOnly {
+        uint256 fare = ridesDataStorage.getFare(rideId);
+        address passenger = ridesDataStorage.getPassenger(rideId);
+        require(
+            accountsDataStorage.getAccountBalance(passenger) >= fare,
+            "Passenger has insufficient value"
+        );
         ridesDataStorage.completeByDriver(rideId, msg.sender);
+        accountsDataStorage.transfer(fare, passenger, msg.sender); // passenger must complete first
     }
 
     function ratePassenger(uint256 rideId, uint256 score) external functionalAccountOnly {
