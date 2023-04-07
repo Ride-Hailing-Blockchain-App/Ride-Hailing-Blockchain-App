@@ -21,6 +21,7 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     uint256 private rideIdCounter = 1;
     mapping(uint256 => Ride) private ridesData;
     mapping(address => uint256) private passengerRides;
+    address private passengerContract;
 
     function createRide(
         address passenger,
@@ -84,19 +85,19 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         uint256 rideId,
         address passenger
     ) external internalContractsOnly validRideId(rideId) isPassenger(rideId, passenger) {
-        require(
-            ridesData[rideId].driverRideCompleted == true,
-            "Driver must complete the ride first"
-        );
         ridesData[rideId].passengerRideCompleted = true;
-        passengerRides[passenger] = 0;
     }
 
     function completeByDriver(
         uint256 rideId,
         address driver
     ) external internalContractsOnly validRideId(rideId) isDriver(rideId, driver) {
+        require(
+            ridesData[rideId].passengerRideCompleted == true,
+            "Passenger must complete the ride first"
+        );
         ridesData[rideId].driverRideCompleted = true;
+        passengerRides[ridesData[rideId].passenger] = 0;
     }
 
     function rateDriver(uint256 rideId, uint256 score) external validRideId(rideId) {
@@ -145,6 +146,14 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
 
     function hasCurrentRide(address passenger) external view returns (bool) {
         return passengerRides[passenger] != 0;
+    }
+
+    function setPassengerContract(address passengerContractAddress) external {
+        passengerContract = passengerContractAddress;
+    }
+
+    function getPassengerContract() external view returns (address) {
+        return passengerContract;
     }
 
     modifier isPassenger(uint256 rideId, address passenger) {
