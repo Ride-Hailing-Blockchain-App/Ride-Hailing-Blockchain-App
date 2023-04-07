@@ -64,7 +64,18 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint256 disputeId
     ) external view internalContractsOnly returns (uint) {
         return disputeData[disputeId].rideId;
-    } 
+    }
+
+    function getNumOfDefedantUnresponded( //check if have respond to disputes
+        address defendant
+    ) external view internalContractsOnly returns (uint256) {
+        uint unrespondCounter = 0;
+        for(uint i = 0; i < disputeData.length; i++) {
+            if(disputeData[i].defendant == defendant && bytes(disputeData[i].defenseDescription).length == 0)
+            unrespondCounter ++;
+        }
+        return unrespondCounter;
+    }
 
     function getTimeRemaining(uint256 disputeId) external view internalContractsOnly returns (uint256) {
         uint256 timePassed = block.timestamp - disputeData[disputeId].startTime;

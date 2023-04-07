@@ -66,10 +66,10 @@ contract RideDispute {
         if (compensation == true && carFee == false) {
             accountsDataStorage.transfer(MIN_DISPUTE_AMOUNT, msg.sender, address(this));
         } else if (carFee == true && compensation == false) {
-            //passenger contract transfer ride fee to this contract
+            hailingPassengerContract.transferRideFeeToDispute(rideId, address(this));
             accountsDataStorage.transfer(NONCOMPENSATION_AMOUNT, msg.sender, address(this));
         } else if (carFee == true && compensation == true) {
-            //passenger contract transfer ride fee to this contract
+            hailingPassengerContract.transferRideFeeToDispute(rideId, address(this));
             accountsDataStorage.transfer(MIN_DISPUTE_AMOUNT, msg.sender, address(this));
         }
     }
@@ -83,7 +83,8 @@ contract RideDispute {
             "Account does not have enough deposit to respond a dispute"
         );
         disputesDataStorage.setDefenseDescription(disputeId, replyDescription);
-        if (disputesDataStorage.getCompensationDispute(disputeId) == true) { //only transfer when there is dispute for compensation
+        if (disputesDataStorage.getCompensationDispute(disputeId) == true) {
+            //only transfer when there is dispute for compensation
             accountsDataStorage.transfer(MIN_DISPUTE_AMOUNT, msg.sender, address(this)); //disputeDataStorage will hold the deposit from the plaintiff
         } else {
             accountsDataStorage.transfer(NONCOMPENSATION_AMOUNT, msg.sender, address(this));
@@ -160,13 +161,14 @@ contract RideDispute {
         if (plaintiffVotes >= ((totalVotes * 60) / 100) && totalVotes >= MIN_VOTES_REQUIRED) {
             // plaintiff wins if 60 percent or more belongs to plaintiff
             winners = disputesDataStorage.won(disputeId, 1);
-            if(compensationDispute == true) {
-            accountsDataStorage.transfer(
-                MIN_DISPUTE_AMOUNT + TRANSFER_AMOUNT, //transfer to plaintiff the amount he deposited plus the transfer amount from defendant
-                address(this),
-                disputesDataStorage.getPlaintiff(disputeId)
-            );
-            } else { //only return the dispute deposit needed (amount used to split to the voters)
+            if (compensationDispute == true) {
+                accountsDataStorage.transfer(
+                    MIN_DISPUTE_AMOUNT + TRANSFER_AMOUNT, //transfer to plaintiff the amount he deposited plus the transfer amount from defendant
+                    address(this),
+                    disputesDataStorage.getPlaintiff(disputeId)
+                );
+            } else {
+                //only return the dispute deposit needed (amount used to split to the voters)
                 accountsDataStorage.transfer(
                     NONCOMPENSATION_AMOUNT,
                     address(this),
@@ -184,23 +186,24 @@ contract RideDispute {
 
             reduceLoserRating(disputesDataStorage.getDefendant(disputeId));
         } else if (
-            defendantVotes >= ((totalVotes * 60) / 100) && totalVotes >= MIN_VOTES_REQUIRED) {
+            defendantVotes >= ((totalVotes * 60) / 100) && totalVotes >= MIN_VOTES_REQUIRED
+        ) {
             winners = disputesDataStorage.won(disputeId, 2);
-            if(compensationDispute == true) {
+            if (compensationDispute == true) {
                 accountsDataStorage.transfer(
-                MIN_DISPUTE_AMOUNT + TRANSFER_AMOUNT,
-                address(this),
-                disputesDataStorage.getDefendant(disputeId)
+                    MIN_DISPUTE_AMOUNT + TRANSFER_AMOUNT,
+                    address(this),
+                    disputesDataStorage.getDefendant(disputeId)
                 );
             } else {
                 accountsDataStorage.transfer(
-                NONCOMPENSATION_AMOUNT,
-                address(this),
-                disputesDataStorage.getDefendant(disputeId)
+                    NONCOMPENSATION_AMOUNT,
+                    address(this),
+                    disputesDataStorage.getDefendant(disputeId)
                 );
             }
 
-            if(carFeeDispute == true) {
+            if (carFeeDispute == true) {
                 uint carFare = ridesDataStorage.getFare(disputesDataStorage.getRideId(disputeId));
                 accountsDataStorage.transfer(
                     carFare,
@@ -215,39 +218,39 @@ contract RideDispute {
             //Just transfer deposited amount to defendant and plaintiff
             //voters get nothing back
             if (compensationDispute == true) {
-            accountsDataStorage.transfer(
-                MIN_DISPUTE_AMOUNT,
-                address(this),
-                disputesDataStorage.getDefendant(disputeId)
-            );
-            accountsDataStorage.transfer(
-                MIN_DISPUTE_AMOUNT,
-                address(this),
-                disputesDataStorage.getPlaintiff(disputeId)
-            );
+                accountsDataStorage.transfer(
+                    MIN_DISPUTE_AMOUNT,
+                    address(this),
+                    disputesDataStorage.getDefendant(disputeId)
+                );
+                accountsDataStorage.transfer(
+                    MIN_DISPUTE_AMOUNT,
+                    address(this),
+                    disputesDataStorage.getPlaintiff(disputeId)
+                );
             } else {
                 accountsDataStorage.transfer(
-                NONCOMPENSATION_AMOUNT,
-                address(this),
-                disputesDataStorage.getDefendant(disputeId)
-            );
-            accountsDataStorage.transfer(
-                NONCOMPENSATION_AMOUNT,
-                address(this),
-                disputesDataStorage.getPlaintiff(disputeId)
-            );
-            }
-            uint[] memory voterDeposits = disputesDataStorage.getAllVoterDeposit(disputeId);
-            address[] memory voters = disputesDataStorage.getAllVoters(disputeId);
+                    NONCOMPENSATION_AMOUNT,
+                    address(this),
+                    disputesDataStorage.getDefendant(disputeId)
+                );
+                accountsDataStorage.transfer(
+                    NONCOMPENSATION_AMOUNT,
+                    address(this),
+                    disputesDataStorage.getPlaintiff(disputeId)
+                );
 
-            for (uint i = 0; i < voters.length; i++) {
-                accountsDataStorage.transfer(voterDeposits[i], address(this), voters[i]); //transfer voter deposits back to individual voters
+                uint[] memory voterDeposits = disputesDataStorage.getAllVoterDeposit(disputeId);
+                address[] memory voters = disputesDataStorage.getAllVoters(disputeId);
+
+                for (uint i = 0; i < voters.length; i++) {
+                    accountsDataStorage.transfer(voterDeposits[i], address(this), voters[i]); //transfer voter deposits back to individual voters
+                }
             }
         }
 
         uint totalVoterDepositAmount = disputesDataStorage.getTotalVoterDeposit(disputeId);
-        uint256 winnerPrize = (NONCOMPENSATION_AMOUNT + totalVoterDepositAmount) /
-            winners.length; //transfer remaining amount minus the transfer amount to the correct voters
+        uint256 winnerPrize = (NONCOMPENSATION_AMOUNT + totalVoterDepositAmount) / winners.length; //transfer remaining amount minus the transfer amount to the correct voters
         for (uint256 i = 0; i < winners.length; i++) {
             accountsDataStorage.transfer(winnerPrize, address(this), winners[i]);
         }

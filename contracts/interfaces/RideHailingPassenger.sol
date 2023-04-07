@@ -3,17 +3,21 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "../data_storages/RideHailingAccountsDataStorage.sol";
 import "../data_storages/RideHailingRidesDataStorage.sol";
+import "../data_storages/RideHailingDisputesDataStorage.sol";
 
 contract RideHailingPassenger {
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
+    RideHailingDisputesDataStorage private rideDisputeDataStorage;
 
     constructor(
         RideHailingAccountsDataStorage accountsDataStorageAddress,
-        RideHailingRidesDataStorage ridesDataStorageAddress
+        RideHailingRidesDataStorage ridesDataStorageAddress,
+        RideHailingDisputesDataStorage rideDisputeDataStorageAddress
     ) {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
+        rideDisputeDataStorage = rideDisputeDataStorageAddress;
     }
 
     function requestRide(
@@ -28,11 +32,21 @@ contract RideHailingPassenger {
         );
 
         require(
+            rideDisputeDataStorage.getNumOfDefedantUnresponded(msg.sender) == 0,
+            "You have yet to respond your disputes"
+        );
+
+        require(
             ridesDataStorage.hasCurrentRide(msg.sender) == false,
             "Passenger cannot request ride as previous ride has not been completed"
         );
         ridesDataStorage.createRide(msg.sender, startLocation, destination, bidAmount);
         accountsDataStorage.addBalance(msg.value, address(this));
+    }
+
+    function transferRideFeeToDispute(uint256 rideId, address disputeAddress) external payable functionalAccountOnly {
+        uint256 rideFare = ridesDataStorage.getFare(rideId);
+        accountsDataStorage.transfer(rideFare, address(this), disputeAddress);
     }
 
     // editRide?

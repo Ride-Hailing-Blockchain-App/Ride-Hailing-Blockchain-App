@@ -36,11 +36,12 @@ contract RideHailingApp {
             accountsDataStorage,
             disputesDataStorage
         );
-        passengerContract = new RideHailingPassenger(accountsDataStorage, ridesDataStorage);
+        passengerContract = new RideHailingPassenger(accountsDataStorage, ridesDataStorage, disputesDataStorage);
         driverContract = new RideHailingDriver(
             accountsDataStorage,
             ridesDataStorage,
             vehiclesDataStorage,
+            disputesDataStorage,
             oracleInterface
         );
         disputesContract = new RideDispute(
