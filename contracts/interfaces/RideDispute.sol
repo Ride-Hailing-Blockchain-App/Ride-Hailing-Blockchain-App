@@ -89,6 +89,38 @@ contract RideDispute {
         } else {
             accountsDataStorage.transfer(NONCOMPENSATION_AMOUNT, msg.sender, address(this));
         }
+
+        disputesDataStorage.setDisputeResponse(disputeId); 
+    }
+
+    function giveInDispute(uint256 disputeId) external {
+        require(disputesDataStorage.checkDisputeExist(disputeId) == true, "No such dispute exist!");
+        address defendant = disputesDataStorage.getDefendant(disputeId);
+        require(msg.sender == defendant, "You are not the dispute's defendant!");
+        bool carFeeDispute = disputesDataStorage.getCarFeeDispute(disputeId);
+        bool compensationDispute = disputesDataStorage.getCompensationDispute(disputeId);
+
+        if (carFeeDispute == true && compensationDispute == false) {
+            uint256 rideFare = ridesDataStorage.getFare(disputesDataStorage.getRideId(disputeId));
+            accountsDataStorage.transfer(rideFare, address(this), disputesDataStorage.getPlaintiff(disputeId));
+        } else if (carFeeDispute == false && compensationDispute == true) {
+            accountsDataStorage.transfer(TRANSFER_AMOUNT, msg.sender, disputesDataStorage.getPlaintiff(disputeId));
+        } else if (carFeeDispute == true && compensationDispute == true) {
+            uint256 rideFare = ridesDataStorage.getFare(disputesDataStorage.getRideId(disputeId));
+            accountsDataStorage.transfer(rideFare, address(this), disputesDataStorage.getPlaintiff(disputeId));
+            accountsDataStorage.transfer(TRANSFER_AMOUNT, msg.sender, disputesDataStorage.getPlaintiff(disputeId));
+        }
+
+        uint[] memory voterDeposits = disputesDataStorage.getAllVoterDeposit(disputeId);
+        address[] memory voters = disputesDataStorage.getAllVoters(disputeId);
+
+        for (uint i = 0; i < voters.length; i++) {
+            accountsDataStorage.transfer(voterDeposits[i], address(this), voters[i]); //transfer voter deposits back to individual voters
+        } 
+
+        disputesDataStorage.setDisputeResponse(disputeId);
+        disputesDataStorage.setDisputeResolved(disputeId);
+        reduceLoserRating(disputesDataStorage.getDefendant(disputeId));
     }
 
     function checkLoanExpiry(uint256 disputeId) external {

@@ -10,6 +10,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint rideId;
         string complaintDescription;
         string defenseDescription;
+        bool responded;
         bool carFeeDispute;
         bool compensationDispute;
         bool resolved;
@@ -39,6 +40,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 rideId,
                 complaintDescription,
                 "",
+                false,
                 carFeeDispute,
                 compensationDispute,
                 false,
@@ -66,12 +68,18 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].rideId;
     }
 
+    function setDisputeResponse (
+        uint256 disputeId
+    ) external internalContractsOnly {
+        disputeData[disputeId].responded = true;
+    }
+
     function getNumOfDefedantUnresponded( //check if have respond to disputes
         address defendant
     ) external view internalContractsOnly returns (uint256) {
         uint unrespondCounter = 0;
         for(uint i = 0; i < disputeData.length; i++) {
-            if(disputeData[i].defendant == defendant && bytes(disputeData[i].defenseDescription).length == 0)
+            if(disputeData[i].defendant == defendant && disputeData[i].responded == false)
             unrespondCounter ++;
         }
         return unrespondCounter;
