@@ -56,8 +56,8 @@ contract RideDispute {
         );
 
         require(
-            accountsDataStorage.getOverallRating(msg.sender) >= 3,
-            "You need a minimum overall rating of 3 to vote"
+            accountsDataStorage.getOverallRating(msg.sender) >= 5,
+            "You need a minimum overall rating of 5 to vote"
         );
 
         // 1 = plaintiff, 2 = defendant
