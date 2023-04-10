@@ -11,8 +11,8 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         string complaintDescription;
         string defenseDescription;
         bool responded;
-        bool carFeeDispute;
-        bool compensationDispute;
+        bool rideFareDisputed;
+        bool compensationDisputed;
         bool resolved;
         uint256 plaintiffVotes;
         uint256 defendantVotes;
@@ -29,8 +29,8 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         address defendant,
         string calldata complaintDescription,
         uint rideId,
-        bool carFeeDispute,
-        bool compensationDispute
+        bool rideFareDisputed,
+        bool compensationDisputed
     ) external internalContractsOnly returns (uint256) {
         uint256 disputeId = disputeData.length;
         disputeData.push(
@@ -41,8 +41,8 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 complaintDescription,
                 "",
                 false,
-                carFeeDispute,
-                compensationDispute,
+                rideFareDisputed,
+                compensationDisputed,
                 false,
                 0,
                 0,
@@ -68,13 +68,13 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].rideId;
     }
 
-    function setDisputeResponse (
+    function markResponded (
         uint256 disputeId
     ) external internalContractsOnly {
         disputeData[disputeId].responded = true;
     }
 
-    function getNumOfDefedantUnresponded( //check if have respond to disputes
+    function getNumUnrespondedDefendants( //check if have respond to disputes
         address defendant
     ) external view internalContractsOnly returns (uint256) {
         uint unrespondCounter = 0;
@@ -167,16 +167,16 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].voterList;
     }
 
-    function getCarFeeDispute(
+    function getRideFareDisputed(
         uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
-        return disputeData[disputeId].carFeeDispute;
+        return disputeData[disputeId].rideFareDisputed;
     }
 
-    function getCompensationDispute (
+    function getCompensationDisputed (
         uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
-        return disputeData[disputeId].compensationDispute;
+        return disputeData[disputeId].compensationDisputed;
     }
 
     function getPlaintiffVotes(
