@@ -4,23 +4,27 @@ pragma solidity >=0.4.22 <0.9.0;
 import "../data_storages/RideHailingAccountsDataStorage.sol";
 import "../data_storages/RideHailingRidesDataStorage.sol";
 import "../data_storages/RideHailingVehiclesDataStorage.sol";
+import "../data_storages/RideHailingDisputesDataStorage.sol";
 import "../oracles/RideHailingOracleInterface.sol";
 
 contract RideHailingDriver {
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingVehiclesDataStorage private vehiclesDataStorage;
+    RideHailingDisputesDataStorage private rideDisputeDataStorage;
     RideHailingOracleInterface oracleInterface;
 
     constructor(
         RideHailingAccountsDataStorage accountsDataStorageAddress,
         RideHailingRidesDataStorage ridesDataStorageAddress,
         RideHailingVehiclesDataStorage vehiclesDataStorageAddress,
+        RideHailingDisputesDataStorage rideDisputeDataStorageAddress,
         RideHailingOracleInterface oracleInterfaceAddress
     ) {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
         vehiclesDataStorage = vehiclesDataStorageAddress;
+        rideDisputeDataStorage = rideDisputeDataStorageAddress;
         oracleInterface = oracleInterfaceAddress;
     }
 
@@ -74,6 +78,10 @@ contract RideHailingDriver {
     }
 
     function acceptRideRequest(uint256 rideId) external functionalAccountOnly {
+        require(
+            rideDisputeDataStorage.getNumOfDefedantUnresponded(msg.sender) == 0,
+            "You have yet to respond your disputes"
+        );
         ridesDataStorage.acceptByDriver(rideId, msg.sender);
     }
 

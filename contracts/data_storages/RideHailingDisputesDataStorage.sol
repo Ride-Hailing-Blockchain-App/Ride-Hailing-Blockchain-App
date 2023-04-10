@@ -7,6 +7,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     struct Dispute {
         address plaintiff;
         address defendant;
+        uint rideId;
         string complaintDescription;
         string defenseDescription;
         bool responded;
@@ -17,20 +18,26 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint256 defendantVotes;
         address[] voterList; //only one person can vote once
         uint8[] voterChoice;
+        uint[] voterDeposits;
         address[] voteWinners;
+        uint256 startTime;
     }
     Dispute[] private disputeData;
 
     function createDispute(
         address plaintiff,
         address defendant,
-        string calldata complaintDescription
+        string calldata complaintDescription,
+        uint rideId,
+        bool carFeeDispute,
+        bool compensationDispute
     ) external internalContractsOnly returns (uint256) {
         uint256 disputeId = disputeData.length;
         disputeData.push(
             Dispute(
                 plaintiff,
                 defendant,
+                rideId,
                 complaintDescription,
                 "",
                 false,
@@ -41,7 +48,9 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 0,
                 new address[](0),
                 new uint8[](0),
-                new address[](0)
+                new uint[](0),
+                new address[](0),
+                block.timestamp
             )
         );
         return disputeId;
@@ -128,6 +137,48 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         disputeData[disputeId].voterList.push(voter);
     }
 
+    function recordVoterDeposit(
+        uint256 disputeId,
+        uint voterDeposit
+    ) external internalContractsOnly {
+        disputeData[disputeId].voterDeposits.push(voterDeposit);
+    }
+
+    function getTotalVoterDeposit(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (uint) {
+        uint [] memory allVoterDeposits = disputeData[disputeId].voterDeposits;
+        uint totalAmount = 0;
+        for(uint i = 0; i < allVoterDeposits.length; i++) {
+            totalAmount = totalAmount + allVoterDeposits[i];
+        }
+        return totalAmount;
+    }
+
+    function getAllVoterDeposit(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (uint [] memory) {
+        return disputeData[disputeId].voterDeposits;
+    }
+
+    function getAllVoters(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (address [] memory) {
+        return disputeData[disputeId].voterList;
+    }
+
+    function getCarFeeDispute(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (bool) {
+        return disputeData[disputeId].carFeeDispute;
+    }
+
+    function getCompensationDispute (
+        uint256 disputeId
+    ) external view internalContractsOnly returns (bool) {
+        return disputeData[disputeId].compensationDispute;
+    }
+
     function getPlaintiffVotes(
         uint256 disputeId
     ) external view internalContractsOnly returns (uint256) {
@@ -146,6 +197,20 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
 
     function getPlaintiff(uint256 disputeId) external view internalContractsOnly returns (address) {
         return disputeData[disputeId].plaintiff;
+    }
+
+    function checkAlreadyVoted(
+        uint256 disputeId,
+        address voterAddress
+    ) external view internalContractsOnly returns (bool) {
+        bool found = false;
+        for(uint256 i = 0; i < disputeData[disputeId].voterList.length; i++) {
+            if(disputeData[disputeId].voterList[i] == voterAddress) {
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     function checkDisputeExist(
@@ -178,5 +243,13 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
             }
         }
         return false;
+    }
+
+    function setDisputeResolved(uint256 disputeId) external internalContractsOnly {
+        disputeData[disputeId].resolved = true;
+    }
+
+    function getDisputeResolve(uint256 disputeId) external view internalContractsOnly returns (bool) {
+        return disputeData[disputeId].resolved;
     }
 }

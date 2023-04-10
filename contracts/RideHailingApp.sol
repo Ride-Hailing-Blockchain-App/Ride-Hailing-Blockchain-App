@@ -36,17 +36,19 @@ contract RideHailingApp {
             accountsDataStorage,
             disputesDataStorage
         );
-        passengerContract = new RideHailingPassenger(accountsDataStorage, ridesDataStorage);
+        passengerContract = new RideHailingPassenger(accountsDataStorage, ridesDataStorage, disputesDataStorage);
         driverContract = new RideHailingDriver(
             accountsDataStorage,
             ridesDataStorage,
             vehiclesDataStorage,
+            disputesDataStorage,
             oracleInterface
         );
         disputesContract = new RideDispute(
             accountsDataStorage,
             ridesDataStorage,
-            disputesDataStorage
+            disputesDataStorage,
+            passengerContract
         );
         address[] memory internalAddresses = new address[](5);
         internalAddresses[0] = address(this);
