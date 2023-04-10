@@ -33,7 +33,7 @@ contract RideHailingPassenger {
         );
 
         require(
-            rideDisputeDataStorage.getNumOfDefedantUnresponded(msg.sender) == 0,
+            rideDisputeDataStorage.getNumUnrespondedDefendants(msg.sender) == 0,
             "You have yet to respond your disputes"
         );
 
