@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 const _deploy_contracts = require("../migrations/2_deploy_contracts");
 const truffleAssert = require("truffle-assertions");
 const BigNumber = require("bignumber.js");
@@ -33,6 +32,7 @@ contract("test_ride_hailing_accounts", function (accounts) {
     let accountBalance = new BigNumber(
       await accountsInstance.getAccountBalance({ from: accounts[0] })
     );
+    console.log(accountBalance);
     return assert(accountBalance.isEqualTo(oneEth.dividedBy(10)));
   });
 });

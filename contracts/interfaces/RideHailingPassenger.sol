@@ -45,7 +45,7 @@ contract RideHailingPassenger {
         accountsDataStorage.addBalance(msg.value, address(this));
     }
 
-    function transferRideFeeToDispute(uint256 rideId, address disputeAddress) external payable functionalAccountOnly {
+    function transferRideFeeToDispute(uint256 rideId, address disputeAddress) external {
         uint256 rideFare = ridesDataStorage.getFare(rideId);
         accountsDataStorage.transfer(rideFare, address(this), disputeAddress);
     }

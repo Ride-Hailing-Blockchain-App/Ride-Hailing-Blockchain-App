@@ -5,6 +5,7 @@ import "./interfaces/RideHailingAccountManagement.sol";
 import "./interfaces/RideHailingPassenger.sol";
 import "./interfaces/RideHailingDriver.sol";
 import "./interfaces/RideDispute.sol";
+import "./interfaces/RideDisputeLibrary.sol";
 import "./data_storages/RideHailingAccountsDataStorage.sol";
 import "./data_storages/RideHailingDisputesDataStorage.sol";
 import "./data_storages/RideHailingRidesDataStorage.sol";
@@ -17,6 +18,7 @@ contract RideHailingApp {
     RideHailingPassenger public passengerContract;
     RideHailingDriver public driverContract;
     RideDispute public disputesContract;
+    RideDisputeLibrary public disputesLibraryContract;
     RideHailingOracleInterface public oracleInterface;
     // data
     RideHailingAccountsDataStorage private accountsDataStorage;
@@ -50,12 +52,21 @@ contract RideHailingApp {
             disputesDataStorage,
             passengerContract
         );
-        address[] memory internalAddresses = new address[](5);
+        disputesLibraryContract = new RideDisputeLibrary(
+            accountsDataStorage,
+            ridesDataStorage,
+            disputesDataStorage,
+            passengerContract,
+            disputesContract
+        );
+
+        address[] memory internalAddresses = new address[](6);
         internalAddresses[0] = address(this);
         internalAddresses[1] = address(accountsContract);
         internalAddresses[2] = address(passengerContract);
         internalAddresses[3] = address(driverContract);
         internalAddresses[4] = address(disputesContract);
+        internalAddresses[5] = address(disputesLibraryContract);
         accountsDataStorage.setInternalContractAddresses(internalAddresses);
         disputesDataStorage.setInternalContractAddresses(internalAddresses);
         ridesDataStorage.setInternalContractAddresses(internalAddresses);

@@ -41,4 +41,9 @@ contract RideHailingAccountManagement {
         accountsDataStorage.withdrawFunds(withdrawAmt, msg.sender);
     }
     // deleteAccount? but it makes making spam accounts easier, maybe refund only 90% of deposit
+
+    //for testing purpose
+    function rateUser(uint256 score, address ratee) external {
+        accountsDataStorage.rateUser(score, ratee);
+    }
 }

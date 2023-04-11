@@ -7,7 +7,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     struct Dispute {
         address plaintiff;
         address defendant;
-        uint rideId;
+        uint256 rideId;
         string complaintDescription;
         string defenseDescription;
         bool responded;
@@ -18,7 +18,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint256 defendantVotes;
         address[] voterList; //only one person can vote once
         uint8[] voterChoice;
-        uint[] voterDeposits;
+        uint256[] voterDeposits;
         address[] voteWinners;
         uint256 startTime;
     }
@@ -28,7 +28,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         address plaintiff,
         address defendant,
         string calldata complaintDescription,
-        uint rideId,
+        uint256 rideId,
         bool rideFareDisputed,
         bool compensationDisputed
     ) external internalContractsOnly returns (uint256) {
@@ -48,7 +48,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 0,
                 new address[](0),
                 new uint8[](0),
-                new uint[](0),
+                new uint256[](0),
                 new address[](0),
                 block.timestamp
             )
@@ -64,7 +64,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
 
     function getRideId(
         uint256 disputeId
-    ) external view internalContractsOnly returns (uint) {
+    ) external view internalContractsOnly returns (uint256) {
         return disputeData[disputeId].rideId;
     }
 
@@ -74,11 +74,17 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         disputeData[disputeId].responded = true;
     }
 
+    function getResponded (
+        uint256 disputeId
+    ) external view internalContractsOnly returns (bool) {
+        return disputeData[disputeId].responded;
+    }
+
     function getNumUnrespondedDefendants( //check if have respond to disputes
         address defendant
     ) external view internalContractsOnly returns (uint256) {
         uint unrespondCounter = 0;
-        for(uint i = 0; i < disputeData.length; i++) {
+        for(uint256 i = 0; i < disputeData.length; i++) {
             if(disputeData[i].defendant == defendant && disputeData[i].responded == false)
             unrespondCounter ++;
         }
@@ -146,7 +152,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
 
     function getTotalVoterDeposit(
         uint256 disputeId
-    ) external view internalContractsOnly returns (uint) {
+    ) external view internalContractsOnly returns (uint256) {
         uint [] memory allVoterDeposits = disputeData[disputeId].voterDeposits;
         uint totalAmount = 0;
         for(uint i = 0; i < allVoterDeposits.length; i++) {
