@@ -38,7 +38,11 @@ contract RideHailingApp {
             accountsDataStorage,
             disputesDataStorage
         );
-        passengerContract = new RideHailingPassenger(accountsDataStorage, ridesDataStorage, disputesDataStorage);
+        passengerContract = new RideHailingPassenger(
+            accountsDataStorage,
+            ridesDataStorage,
+            disputesDataStorage
+        );
         driverContract = new RideHailingDriver(
             accountsDataStorage,
             ridesDataStorage,
@@ -52,21 +56,13 @@ contract RideHailingApp {
             disputesDataStorage,
             passengerContract
         );
-        disputesLibraryContract = new RideDisputeLibrary(
-            accountsDataStorage,
-            ridesDataStorage,
-            disputesDataStorage,
-            passengerContract,
-            disputesContract
-        );
 
-        address[] memory internalAddresses = new address[](6);
+        address[] memory internalAddresses = new address[](5);
         internalAddresses[0] = address(this);
         internalAddresses[1] = address(accountsContract);
         internalAddresses[2] = address(passengerContract);
         internalAddresses[3] = address(driverContract);
         internalAddresses[4] = address(disputesContract);
-        internalAddresses[5] = address(disputesLibraryContract);
         accountsDataStorage.setInternalContractAddresses(internalAddresses);
         disputesDataStorage.setInternalContractAddresses(internalAddresses);
         ridesDataStorage.setInternalContractAddresses(internalAddresses);

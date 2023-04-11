@@ -18,7 +18,6 @@ contract RideHailingPassenger {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
         rideDisputeDataStorage = rideDisputeDataStorageAddress;
-        ridesDataStorage.setPassengerContract(address(this));
     }
 
     function requestRide(
@@ -42,12 +41,7 @@ contract RideHailingPassenger {
             "Passenger cannot request ride as previous ride has not been completed"
         );
         ridesDataStorage.createRide(msg.sender, startLocation, destination, bidAmount);
-        accountsDataStorage.addBalance(msg.value, address(this));
-    }
-
-    function transferRideFeeToDispute(uint256 rideId, address disputeAddress) external {
-        uint256 rideFare = ridesDataStorage.getFare(rideId);
-        accountsDataStorage.transfer(rideFare, address(this), disputeAddress);
+        accountsDataStorage.addBalance(msg.value, address(accountsDataStorage));
     }
 
     // editRide?

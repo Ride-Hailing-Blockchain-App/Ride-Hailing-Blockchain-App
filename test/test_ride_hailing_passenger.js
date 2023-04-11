@@ -42,16 +42,12 @@ contract("RideHailingPassenger", (accounts) => {
     const newBalance = new BigNumber(
       await accountsInstance.getAccountBalance({ from: passengerAccount })
     );
-    const passengerContractBalance = new BigNumber(
-      await accountsInstance.getAccountBalance({ from: passengerContractAddress })
-    );
 
     // assert(
     //   newBalance.eq(initialBalance.add(web3.utils.toWei("1", "ether"))),
     //   "Passenger account balance should be increased by 1 ether"
     // );
     assert(newBalance.isEqualTo(initialBalance));
-    assert(passengerContractBalance.isEqualTo(oneEth));
     // const hasRide = await ridesDataStorage.hasCurrentRide(passengerAccount);
     // assert(hasRide, "Passenger should have an ongoing ride");
   });

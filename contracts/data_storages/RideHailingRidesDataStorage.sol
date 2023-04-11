@@ -21,7 +21,6 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     uint256 private rideIdCounter = 1;
     mapping(uint256 => Ride) private ridesData;
     mapping(address => uint256) private passengerRides;
-    address private passengerContract;
 
     function createRide(
         address passenger,
@@ -146,14 +145,6 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
 
     function hasCurrentRide(address passenger) external view returns (bool) {
         return passengerRides[passenger] != 0;
-    }
-
-    function setPassengerContract(address passengerContractAddress) external {
-        passengerContract = passengerContractAddress;
-    }
-
-    function getPassengerContract() external view returns (address) {
-        return passengerContract;
     }
 
     modifier isPassenger(uint256 rideId, address passenger) {

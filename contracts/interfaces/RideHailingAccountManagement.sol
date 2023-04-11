@@ -34,12 +34,13 @@ contract RideHailingAccountManagement {
     function withdrawFunds(uint256 withdrawAmt) external {
         require(accountsDataStorage.accountIsFunctional(msg.sender), "Minimum deposit not met");
         require(
-            disputesDataStorage.hasDispute(msg.sender),
+            disputesDataStorage.hasActiveDispute(msg.sender),
             "Passenger cannot withdraw funds due to active dispute"
         );
 
         accountsDataStorage.withdrawFunds(withdrawAmt, msg.sender);
     }
+
     // deleteAccount? but it makes making spam accounts easier, maybe refund only 90% of deposit
 
     //for testing purpose

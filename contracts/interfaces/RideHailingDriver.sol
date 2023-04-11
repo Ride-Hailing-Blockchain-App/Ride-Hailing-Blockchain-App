@@ -89,13 +89,12 @@ contract RideHailingDriver {
 
     function completeRide(uint256 rideId) external functionalAccountOnly {
         uint256 fare = ridesDataStorage.getFare(rideId);
-        address passengerContract = ridesDataStorage.getPassengerContract();
         require(
-            accountsDataStorage.getAccountBalance(passengerContract) >= fare,
+            accountsDataStorage.getAccountBalance(address(accountsDataStorage)) >= fare,
             "Passenger contract has insufficient value"
         );
         ridesDataStorage.completeByDriver(rideId, msg.sender);
-        accountsDataStorage.transfer(fare, passengerContract, msg.sender);
+        accountsDataStorage.transfer(fare, address(accountsDataStorage), msg.sender);
     }
 
     function ratePassenger(uint256 rideId, uint256 score) external functionalAccountOnly {

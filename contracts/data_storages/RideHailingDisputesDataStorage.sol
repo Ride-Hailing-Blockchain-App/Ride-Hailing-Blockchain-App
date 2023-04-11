@@ -62,44 +62,42 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId];
     }
 
-    function getRideId(
-        uint256 disputeId
-    ) external view internalContractsOnly returns (uint256) {
+    function getRideId(uint256 disputeId) external view internalContractsOnly returns (uint256) {
         return disputeData[disputeId].rideId;
     }
 
-    function markResponded (
-        uint256 disputeId
-    ) external internalContractsOnly {
+    function markResponded(uint256 disputeId) external internalContractsOnly {
         disputeData[disputeId].responded = true;
     }
 
-    function getResponded (
+    function isDisputeResponded(
         uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
         return disputeData[disputeId].responded;
     }
 
-    function getNumUnrespondedDefendants( //check if have respond to disputes
+    function getNumUnrespondedDefendants(
+        //check if have respond to disputes
         address defendant
     ) external view internalContractsOnly returns (uint256) {
         uint unrespondCounter = 0;
-        for(uint256 i = 0; i < disputeData.length; i++) {
-            if(disputeData[i].defendant == defendant && disputeData[i].responded == false)
-            unrespondCounter ++;
+        for (uint256 i = 0; i < disputeData.length; i++) {
+            if (disputeData[i].defendant == defendant && disputeData[i].responded == false)
+                unrespondCounter++;
         }
         return unrespondCounter;
     }
 
-    function getTimeRemaining(uint256 disputeId) external view internalContractsOnly returns (uint256) {
+    function getTimeRemaining(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (uint256) {
         uint256 timePassed = block.timestamp - disputeData[disputeId].startTime;
-        if(timePassed >= 1 days) {
+        if (timePassed >= 1 days) {
             return 0;
         } else {
             return 1 days - timePassed;
         }
     }
-
 
     function generateDisputeForVoting() external view returns (uint256) {
         // dummy oracle : get unresolved dispute by rng
@@ -110,12 +108,6 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         }
         // returns max uint256 value if no unresolved dispute found
         return (2 ^ (256 - 1));
-    }
-
-    function checkDisputeStatus(
-        uint256 disputeId
-    ) external view returns (bool) {
-        return disputeData[disputeId].resolved;
     }
 
     function setDefenseDescription(
@@ -153,33 +145,33 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     function getTotalVoterDeposit(
         uint256 disputeId
     ) external view internalContractsOnly returns (uint256) {
-        uint [] memory allVoterDeposits = disputeData[disputeId].voterDeposits;
+        uint[] memory allVoterDeposits = disputeData[disputeId].voterDeposits;
         uint totalAmount = 0;
-        for(uint i = 0; i < allVoterDeposits.length; i++) {
+        for (uint i = 0; i < allVoterDeposits.length; i++) {
             totalAmount = totalAmount + allVoterDeposits[i];
         }
         return totalAmount;
     }
 
-    function getAllVoterDeposit(
+    function getAllVotersDepositAmount(
         uint256 disputeId
-    ) external view internalContractsOnly returns (uint [] memory) {
+    ) external view internalContractsOnly returns (uint[] memory) {
         return disputeData[disputeId].voterDeposits;
     }
 
     function getAllVoters(
         uint256 disputeId
-    ) external view internalContractsOnly returns (address [] memory) {
+    ) external view internalContractsOnly returns (address[] memory) {
         return disputeData[disputeId].voterList;
     }
 
-    function getRideFareDisputed(
+    function isRideFareDisputed(
         uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
         return disputeData[disputeId].rideFareDisputed;
     }
 
-    function getCompensationDisputed (
+    function isCompensationDisputed(
         uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
         return disputeData[disputeId].compensationDisputed;
@@ -205,13 +197,13 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].plaintiff;
     }
 
-    function checkAlreadyVoted(
-        uint256 disputeId,
-        address voterAddress
+    function hasVoted(
+        address voterAddress,
+        uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
         bool found = false;
-        for(uint256 i = 0; i < disputeData[disputeId].voterList.length; i++) {
-            if(disputeData[disputeId].voterList[i] == voterAddress) {
+        for (uint256 i = 0; i < disputeData[disputeId].voterList.length; i++) {
+            if (disputeData[disputeId].voterList[i] == voterAddress) {
                 found = true;
             }
         }
@@ -219,7 +211,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return found;
     }
 
-    function checkDisputeExist(
+    function isValidDisputeId(
         uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
         if (disputeId > disputeData.length) {
@@ -229,7 +221,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         }
     }
 
-    function won(
+    function getWinningVoters(
         uint256 disputeId,
         uint256 winner
     ) external internalContractsOnly returns (address[] memory) {
@@ -242,9 +234,12 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].voteWinners;
     }
 
-    function hasDispute(address user) external view internalContractsOnly returns (bool) {
+    function hasActiveDispute(address user) external view internalContractsOnly returns (bool) {
         for (uint256 i = 0; i <= disputeData.length; i++) {
-            if (disputeData[i].plaintiff == user || disputeData[i].defendant == user) {
+            if (
+                (disputeData[i].plaintiff == user || disputeData[i].defendant == user) &&
+                !disputeData[i].resolved
+            ) {
                 return true;
             }
         }
@@ -255,7 +250,9 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         disputeData[disputeId].resolved = true;
     }
 
-    function getDisputeResolve(uint256 disputeId) external view internalContractsOnly returns (bool) {
+    function isDisputeResolved(
+        uint256 disputeId
+    ) external view internalContractsOnly returns (bool) {
         return disputeData[disputeId].resolved;
     }
 }
