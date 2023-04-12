@@ -64,6 +64,24 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId];
     }
 
+    function getOpenDisputes(address user) external view internalContractsOnly returns (uint256[] memory openDisputes) {
+        uint numOpenDisputes = 0;
+        for (uint i = 0; i < disputeData.length; i++) {
+            if ((disputeData[i].plaintiff == user || disputeData[i].defendant == user) && !disputeData[i].resolved) {
+                numOpenDisputes++;
+            }
+        }
+        openDisputes = new uint256[](numOpenDisputes);
+        uint j = 0;
+        for (uint i = 0; i < disputeData.length; i++) {
+            if ((disputeData[i].plaintiff == user || disputeData[i].defendant == user) && !disputeData[i].resolved) {
+                openDisputes[j] = i;
+                j++;
+            }
+        }
+        return openDisputes;
+    }
+
     function getRideId(uint256 disputeId) external view internalContractsOnly returns (uint256) {
         return disputeData[disputeId].rideId;
     }

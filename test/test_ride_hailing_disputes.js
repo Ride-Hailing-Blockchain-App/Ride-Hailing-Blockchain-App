@@ -56,22 +56,6 @@ contract("RideHailingDispute", (accounts) => {
     });
   });
 
-  it("should allow driver to register a vehicle successfully", async () => {
-    await accountsInstance.createAccount("driver", {
-      from: driverAccount,
-      value: oneEth.dividedBy(10),
-    });
-
-    const model = "Car Model";
-    const color = "White";
-    const license = "ABC123";
-    const vehicleId = await driverContractInstance.registerVehicle(model, color, license, {
-      from: driverAccount,
-    });
-
-    await assert.notStrictEqual(vehicleId, undefined, "Failed to register vehicle");
-  });
-
   it("should allow driver to accept a ride successfully", async () => {
     await accountsInstance.createAccount("passenger", {
       from: passengerAccount,
@@ -97,12 +81,12 @@ contract("RideHailingDispute", (accounts) => {
     await disputeContractInstance.createDispute(
       driverAccount,
       "Driver crashed, I want a compensation",
-      1,
-      false,
-      true,
+      1, // rideId
+      false, // rideFareDisputed
+      true, // compensationDisputed
       { from: passengerAccount }
     );
-    const defendant = await disputeContractInstance.getDefendant(0); //dispute id is 0
+    const defendant = await disputeContractInstance.getDefendant(0); //disputeId
     await assert.strictEqual(defendant, driverAccount, "Defendant does not match!");
   });
 

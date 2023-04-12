@@ -38,7 +38,7 @@ contract RideDispute {
         uint rideId,
         bool rideFareDisputed,
         bool compensationDisputed
-    ) external {
+    ) external returns (uint256) {
         require(
             (ridesDataStorage.getDriver(rideId) == msg.sender &&
                 ridesDataStorage.getPassenger(rideId) == defendant) ||
@@ -47,7 +47,7 @@ contract RideDispute {
             "Ride does not involve you and the defendant"
         );
 
-        disputesDataStorage.createDispute(
+        uint256 disputeId = disputesDataStorage.createDispute(
             msg.sender,
             defendant,
             description,
@@ -69,6 +69,12 @@ contract RideDispute {
             "Account does not have enough deposit to create a dispute"
         );
         accountsDataStorage.transfer(disputeAmount, msg.sender, address(this));
+        closeRide(rideId);
+        return disputeId;
+    }
+
+    function getOpenDisputes() external view returns (uint256[] memory) {
+        return disputesDataStorage.getOpenDisputes(msg.sender);
     }
 
     function giveInDispute(uint256 disputeId) external validDispute(disputeId) {
@@ -119,7 +125,7 @@ contract RideDispute {
     function checkDisputeExpiry(uint256 disputeId) external validDispute(disputeId) {
         if (disputesDataStorage.getTimeRemaining(disputeId) == 0) {
             // passed 24 hour mark
-            this.endVote(disputeId);
+            endVote(disputeId);
         }
     }
 
@@ -161,11 +167,11 @@ contract RideDispute {
                 disputesDataStorage.getPlaintiffVotes(disputeId) ==
             MAX_VOTES
         ) {
-            this.endVote(disputeId);
+            endVote(disputeId);
         }
     }
 
-    function endVote(uint256 disputeId) external validDispute(disputeId) {
+    function endVote(uint256 disputeId) private validDispute(disputeId) {
         require(
             disputesDataStorage.isDisputeResolved(disputeId) == false,
             "This dispute has already been resolved!"
@@ -264,6 +270,11 @@ contract RideDispute {
 
     function getDisputeReponded(uint256 disputeId) external view returns (bool) {
         return disputesDataStorage.isDisputeRespondedByDefendant(disputeId);
+    }
+
+    function closeRide(uint256 rideId) private {
+        ridesDataStorage.completeByPassenger(rideId, ridesDataStorage.getPassenger(rideId));
+        ridesDataStorage.completeByDriver(rideId, ridesDataStorage.getDriver(rideId));
     }
 
     modifier validDispute(uint256 disputeId) {
