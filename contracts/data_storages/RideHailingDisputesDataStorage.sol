@@ -23,6 +23,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint256 startTime;
     }
     Dispute[] private disputeData;
+    mapping(address => uint256) numUnrespondedDisputes;
 
     function createDispute(
         address plaintiff,
@@ -53,6 +54,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 block.timestamp
             )
         );
+        numUnrespondedDisputes[defendant]++;
         return disputeId;
     }
 
@@ -67,6 +69,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     }
 
     function markRespondedByDefendant(uint256 disputeId) external internalContractsOnly {
+        numUnrespondedDisputes[disputeData[disputeId].defendant]--;
         disputeData[disputeId].responded = true;
     }
 
@@ -76,16 +79,11 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].responded;
     }
 
-    function getNumUnrespondedDefendants(
+    function getNumUnrespondedDisputes(
         //check if have respond to disputes
         address defendant
     ) external view internalContractsOnly returns (uint256) {
-        uint unrespondCounter = 0;
-        for (uint256 i = 0; i < disputeData.length; i++) {
-            if (disputeData[i].defendant == defendant && disputeData[i].responded == false)
-                unrespondCounter++;
-        }
-        return unrespondCounter;
+        return numUnrespondedDisputes[defendant];
     }
 
     function getTimeRemaining(
@@ -100,10 +98,11 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     }
 
     function generateDisputeForVoting() external view returns (uint256) {
-        // dummy oracle : get unresolved dispute by rng
+        // get random unresolved dispute
+        uint rand = uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp)));
         for (uint256 i = 0; i < disputeData.length; i++) {
-            if (disputeData[i].resolved != true) {
-                return i; // i is the disputeId
+            if (disputeData[(i + rand) % disputeData.length].resolved != true) {
+                return (i + rand) % disputeData.length; // return the disputeId
             }
         }
         // returns max uint256 value if no unresolved dispute found

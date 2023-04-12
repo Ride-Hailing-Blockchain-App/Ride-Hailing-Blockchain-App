@@ -79,7 +79,7 @@ contract RideHailingDriver {
 
     function acceptRideRequest(uint256 rideId) external functionalAccountOnly {
         require(
-            rideDisputeDataStorage.getNumUnrespondedDefendants(msg.sender) == 0,
+            rideDisputeDataStorage.getNumUnrespondedDisputes(msg.sender) == 0,
             "You have yet to respond your disputes"
         );
         ridesDataStorage.acceptByDriver(rideId, msg.sender);
