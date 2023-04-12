@@ -10,7 +10,6 @@ const RideHailingAccountManagement = artifacts.require("RideHailingAccountManage
 const RideHailingPassenger = artifacts.require("RideHailingPassenger");
 const RideHailingDriver = artifacts.require("RideHailingDriver");
 const RideHailingDispute = artifacts.require("RideDispute");
-const RideHailingDisputeLibrary = artifacts.require("RideDisputeLibrary");
 
 const oneEth = new BigNumber(1000000000000000000);
 const MIN_DISPUTE_AMOUNT = 2000000000000000; //compensationDisputed amount + dispute deposit
@@ -22,10 +21,10 @@ const MIN_VOTES_REQUIRED = 20;
 
 contract("RideHailingDispute", (accounts) => {
   const passengerAccount = accounts[0];
+  const driverAccount = accounts[1];
   const passengerAccount1 = accounts[2];
   const passengerAccount2 = accounts[3];
   const passengerAccount3 = accounts[4];
-  const driverAccount = accounts[1];
 
   before(async () => {
     appInstance = await RideHailingApp.deployed();
@@ -156,24 +155,48 @@ contract("RideHailingDispute", (accounts) => {
     await assert(await disputeContractInstance.isDisputeResponded(1));
   });
 
-  // it("Should be able to vote for dispute", async () => {
-  //   await accountsInstance.rateUser(10, passengerAccount1, { from: passengerAccount2 });
-  //   await accountsInstance.rateUser(10, passengerAccount2, { from: passengerAccount2 });
-  //   await accountsInstance.rateUser(10, passengerAccount3, { from: passengerAccount2 });
-  //   await disputeContractInstance.voteDispute(1, 1, { from: passengerAccount1 });
-  //   await disputeContractInstance.voteDispute(1, 1, { from: passengerAccount2 });
-  //   await disputeContractInstance.voteDispute(1, 1, { from: passengerAccount3 });
-  //   let balance = new BigNumber(
-  //     await accountsInstance.getAccountBalance({ from: passengerAccount1 })
-  //   );
-  //   console.log(balance);
-  //   console.log(oneEth.dividedBy(10).minus(new BigNumber(VOTER_DEPOSIT_AMOUNT)));
-  //   await assert.strictEqual(
-  //     balance.isEqualTo(oneEth.dividedBy(10).minus(new BigNumber(VOTER_DEPOSIT_AMOUNT))),
-  //     true,
-  //     "Voted amount is different"
-  //   );
-  // });
+  it("Vote ends with plantiff win", async () => {
+    for (let i = 5; i < 45; i++) {
+      await accountsInstance.createAccount("voter" + i.toString(), {
+        from: accounts[i],
+        value: oneEth.dividedBy(10),
+      });
+      await accountsInstance.rateUser(10, accounts[i], { from: passengerAccount2 });
+      await disputeContractInstance.voteDispute(1, 1, { from: accounts[i] });
+    }
+    let balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    await assert(
+      balance.isEqualTo(
+        oneEth
+          .dividedBy(10)
+          .minus(new BigNumber(await disputeContractInstance.VOTER_DEPOSIT_AMOUNT()))
+      ),
+      "Voter deposit should be deducted"
+    );
+
+    for (let i = 45; i < 55; i++) {
+      await accountsInstance.createAccount("voter" + i.toString(), {
+        from: accounts[i],
+        value: oneEth.dividedBy(10),
+      });
+      await accountsInstance.rateUser(10, accounts[i], { from: passengerAccount2 });
+      await disputeContractInstance.voteDispute(1, 2, { from: accounts[i] });
+    }
+    balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    await assert(
+      balance.isGreaterThan(oneEth.dividedBy(10)),
+      "Winning voter deposit should be returned + winnings"
+    );
+    balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[45] }));
+    await assert(
+      balance.isEqualTo(
+        oneEth
+          .dividedBy(10)
+          .minus(new BigNumber(await disputeContractInstance.VOTER_DEPOSIT_AMOUNT()))
+      ),
+      "Losing voter deposit should be deducted"
+    );
+  });
 
   //   it("Ending dispute before reaching minimum", async () => {
   //     await disputeContractInstance.endVote(1);

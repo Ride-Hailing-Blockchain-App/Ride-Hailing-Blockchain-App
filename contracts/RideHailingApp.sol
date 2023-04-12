@@ -5,7 +5,6 @@ import "./interfaces/RideHailingAccountManagement.sol";
 import "./interfaces/RideHailingPassenger.sol";
 import "./interfaces/RideHailingDriver.sol";
 import "./interfaces/RideDispute.sol";
-import "./interfaces/RideDisputeLibrary.sol";
 import "./data_storages/RideHailingAccountsDataStorage.sol";
 import "./data_storages/RideHailingDisputesDataStorage.sol";
 import "./data_storages/RideHailingRidesDataStorage.sol";
@@ -18,7 +17,6 @@ contract RideHailingApp {
     RideHailingPassenger public passengerContract;
     RideHailingDriver public driverContract;
     RideDispute public disputesContract;
-    RideDisputeLibrary public disputesLibraryContract;
     RideHailingOracleInterface public oracleInterface;
     // data
     RideHailingAccountsDataStorage private accountsDataStorage;

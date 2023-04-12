@@ -18,7 +18,6 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint256 defendantVotes;
         address[] voterList; //only one person can vote once
         uint8[] voterChoice;
-        uint256[] voterDeposits;
         address[] voteWinners;
         uint256 startTime;
     }
@@ -49,7 +48,6 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
                 0,
                 new address[](0),
                 new uint8[](0),
-                new uint256[](0),
                 new address[](0),
                 block.timestamp
             )
@@ -64,17 +62,25 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId];
     }
 
-    function getOpenDisputes(address user) external view internalContractsOnly returns (uint256[] memory openDisputes) {
+    function getOpenDisputes(
+        address user
+    ) external view internalContractsOnly returns (uint256[] memory openDisputes) {
         uint numOpenDisputes = 0;
         for (uint i = 0; i < disputeData.length; i++) {
-            if ((disputeData[i].plaintiff == user || disputeData[i].defendant == user) && !disputeData[i].resolved) {
+            if (
+                (disputeData[i].plaintiff == user || disputeData[i].defendant == user) &&
+                !disputeData[i].resolved
+            ) {
                 numOpenDisputes++;
             }
         }
         openDisputes = new uint256[](numOpenDisputes);
         uint j = 0;
         for (uint i = 0; i < disputeData.length; i++) {
-            if ((disputeData[i].plaintiff == user || disputeData[i].defendant == user) && !disputeData[i].resolved) {
+            if (
+                (disputeData[i].plaintiff == user || disputeData[i].defendant == user) &&
+                !disputeData[i].resolved
+            ) {
                 openDisputes[j] = i;
                 j++;
             }
@@ -152,30 +158,6 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         disputeData[disputeId].voterList.push(voter);
     }
 
-    function recordVoterDeposit(
-        uint256 disputeId,
-        uint voterDeposit
-    ) external internalContractsOnly {
-        disputeData[disputeId].voterDeposits.push(voterDeposit);
-    }
-
-    function getTotalVoterDeposit(
-        uint256 disputeId
-    ) external view internalContractsOnly returns (uint256) {
-        uint[] memory allVoterDeposits = disputeData[disputeId].voterDeposits;
-        uint totalAmount = 0;
-        for (uint i = 0; i < allVoterDeposits.length; i++) {
-            totalAmount = totalAmount + allVoterDeposits[i];
-        }
-        return totalAmount;
-    }
-
-    function getAllVotersDepositAmount(
-        uint256 disputeId
-    ) external view internalContractsOnly returns (uint[] memory) {
-        return disputeData[disputeId].voterDeposits;
-    }
-
     function getAllVoters(
         uint256 disputeId
     ) external view internalContractsOnly returns (address[] memory) {
@@ -243,7 +225,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         uint256 winner
     ) external internalContractsOnly returns (address[] memory) {
         uint8[] memory voterChoiceFinal = disputeData[disputeId].voterChoice;
-        for (uint256 i = 0; i <= voterChoiceFinal.length; i++) {
+        for (uint i = 0; i < voterChoiceFinal.length; i++) {
             if (voterChoiceFinal[i] == winner) {
                 disputeData[disputeId].voteWinners.push(disputeData[disputeId].voterList[i]);
             }

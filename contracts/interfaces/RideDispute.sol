@@ -160,7 +160,6 @@ contract RideDispute {
         }
 
         accountsDataStorage.transfer(VOTER_DEPOSIT_AMOUNT, msg.sender, address(this)); //transfer voter deposit to this contract
-        disputesDataStorage.recordVoterDeposit(disputeId, VOTER_DEPOSIT_AMOUNT);
         //when total vote count reaches the max
         if (
             disputesDataStorage.getDefendantVotes(disputeId) +
@@ -173,7 +172,7 @@ contract RideDispute {
 
     function endVote(uint256 disputeId) private validDispute(disputeId) {
         require(
-            disputesDataStorage.isDisputeResolved(disputeId) == false,
+            !disputesDataStorage.isDisputeResolved(disputeId),
             "This dispute has already been resolved!"
         );
         disputesDataStorage.setDisputeResolved(disputeId); // will set the dispute as resolved regardless of outcome
@@ -182,7 +181,7 @@ contract RideDispute {
         uint256 defendantVotes = disputesDataStorage.getDefendantVotes(disputeId);
         uint256 majorityVotesRequiredTimes1000 = ((plaintiffVotes + defendantVotes) * 3000) / 5; // 60% for majority vote, x1000 to prevent rounding errors
 
-        address[] memory winningVoters = new address[](0);
+        address[] memory winningVoters;
         address winningParty;
         address losingParty;
 
@@ -212,11 +211,10 @@ contract RideDispute {
                 address(this),
                 disputesDataStorage.getDefendant(disputeId)
             );
-            uint[] memory voterDeposits = disputesDataStorage.getAllVotersDepositAmount(disputeId);
             address[] memory voters = disputesDataStorage.getAllVoters(disputeId);
 
             for (uint i = 0; i < voters.length; i++) {
-                accountsDataStorage.transfer(voterDeposits[i], address(this), voters[i]); // transfer voter deposits back to individual voters
+                accountsDataStorage.transfer(VOTER_DEPOSIT_AMOUNT, address(this), voters[i]); // transfer voter deposits back to individual voters
             }
         } else {
             // majority outcome has been determined
@@ -246,11 +244,11 @@ contract RideDispute {
                     winningParty
                 );
             }
-            uint totalVoterDepositAmount = disputesDataStorage.getTotalVoterDeposit(disputeId);
-            uint256 winnerPrize = (MIN_DISPUTE_AMOUNT + totalVoterDepositAmount) /
-                winningVoters.length; //transfer remaining amount minus the transfer amount to the correct voters
+            uint256 winningVoterReward = (MIN_DISPUTE_AMOUNT +
+                winningVoters.length *
+                VOTER_DEPOSIT_AMOUNT) / winningVoters.length; //transfer remaining amount minus the transfer amount to the correct voters
             for (uint256 i = 0; i < winningVoters.length; i++) {
-                accountsDataStorage.transfer(winnerPrize, address(this), winningVoters[i]);
+                accountsDataStorage.transfer(winningVoterReward, address(this), winningVoters[i]);
             }
             reduceLoserRating(losingParty);
         }
