@@ -260,16 +260,16 @@ contract RideDispute {
         accountsDataStorage.reduceRating(loserAddress);
     }
 
-    function checkDisputeSolved(uint256 disputeId) external view returns (bool) {
-        return disputesDataStorage.isDisputeResolved(disputeId);
-    }
-
     function getDefendant(uint256 disputeId) external view returns (address) {
         return disputesDataStorage.getDefendant(disputeId);
     }
 
-    function getDisputeReponded(uint256 disputeId) external view returns (bool) {
+    function isDisputeResponded(uint256 disputeId) external view returns (bool) {
         return disputesDataStorage.isDisputeRespondedByDefendant(disputeId);
+    }
+
+    function isDisputeResolved(uint256 disputeId) external view returns (bool) {
+        return disputesDataStorage.isDisputeResolved(disputeId);
     }
 
     function closeRide(uint256 rideId) private {
