@@ -66,11 +66,11 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
         return disputeData[disputeId].rideId;
     }
 
-    function markResponded(uint256 disputeId) external internalContractsOnly {
+    function markRespondedByDefendant(uint256 disputeId) external internalContractsOnly {
         disputeData[disputeId].responded = true;
     }
 
-    function isDisputeResponded(
+    function isDisputeRespondedByDefendant(
         uint256 disputeId
     ) external view internalContractsOnly returns (bool) {
         return disputeData[disputeId].responded;

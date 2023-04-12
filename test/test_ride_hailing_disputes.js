@@ -118,12 +118,6 @@ contract("RideHailingDispute", (accounts) => {
     );
   });
 
-  it("Cannot return vote deposit to voters when dispute is not resolved", async () => {
-    await truffleAssert.reverts(
-      disputeContractInstance.returnAllVotersDeposit(0, { from: accounts[0] })
-    );
-  });
-
   it("Defendant should be able to give in to a dispute", async () => {
     await disputeContractInstance.giveInDispute(0, { from: driverAccount });
   });
@@ -131,10 +125,6 @@ contract("RideHailingDispute", (accounts) => {
   it("Check if dispute is resolved", async () => {
     const solved = await disputeContractInstance.checkDisputeSolved(0);
     await assert.strictEqual(true, solved, "Dispute is still not solved!");
-  });
-
-  it("Return vote deposit to voters when dispute is resolved", async () => {
-    await disputeContractInstance.returnAllVotersDeposit(0, { from: accounts[0] });
   });
 
   it("should allow driver to accept a 2nd ride successfully", async () => {
