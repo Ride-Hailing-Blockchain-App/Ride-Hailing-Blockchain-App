@@ -17,13 +17,6 @@ contract("test_ride_hailing_accounts", function (accounts) {
   });
   console.log("Testing RideHailingAccounts contract");
 
-  it("Cannot query balance on nonexistent account", async function () {
-    await truffleAssert.reverts(
-      accountsInstance.getAccountBalance({ from: accounts[0] }),
-      "Account does not exist"
-    );
-  });
-
   it("Create account with insufficient deposit", async function () {
     await truffleAssert.reverts(
       accountsInstance.createAccount("username", {
@@ -54,6 +47,28 @@ contract("test_ride_hailing_accounts", function (accounts) {
       }),
       "Account already exists"
     );
+  });
+
+  it("Cannot query balance on nonexistent account", async function () {
+    await truffleAssert.reverts(
+      accountsInstance.getAccountBalance({ from: accounts[1] }),
+      "Account does not exist"
+    );
+  });
+
+  it("Cannot add balance on nonexistent account", async function () {
+    await truffleAssert.reverts(
+      accountsInstance.addBalance({ from: accounts[1], value: 10 }),
+      "Account does not exist"
+    );
+  });
+
+  it("Add funds successfully", async function () {
+    const addBalance = await accountsInstance.addBalance({
+      from: accounts[0],
+      value: 10,
+    });
+    truffleAssert.eventEmitted(addBalance, "FundsAdded");
   });
 
   it("Cannot withdraw more funds than current balance", async function () {
