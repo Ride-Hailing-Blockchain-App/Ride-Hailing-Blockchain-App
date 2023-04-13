@@ -7,6 +7,10 @@ import "../data_storages/RideHailingDisputesDataStorage.sol";
 import "./RideHailingPassenger.sol";
 
 contract RideDispute {
+    event DisputeCreated(uint256 disputeId);
+    event VoteCasted(uint256 disputeId);
+    event DisputeResolved(uint256 disputeId);
+
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingDisputesDataStorage private disputesDataStorage;
@@ -70,6 +74,7 @@ contract RideDispute {
         );
         accountsDataStorage.transfer(disputeAmount, msg.sender, address(this));
         closeRide(rideId);
+        emit DisputeCreated(disputeId);
         return disputeId;
     }
 
@@ -101,6 +106,7 @@ contract RideDispute {
         disputesDataStorage.markRespondedByDefendant(disputeId);
         disputesDataStorage.setDisputeResolved(disputeId);
         reduceLoserRating(defendant);
+        emit DisputeResolved(disputeId);
     }
 
     function challengeDispute(
@@ -158,8 +164,8 @@ contract RideDispute {
         } else {
             disputesDataStorage.increaseDefendantVotes(disputeId, msg.sender);
         }
-
         accountsDataStorage.transfer(VOTER_DEPOSIT_AMOUNT, msg.sender, address(this)); //transfer voter deposit to this contract
+        emit VoteCasted(disputeId);
         //when total vote count reaches the max
         if (
             disputesDataStorage.getDefendantVotes(disputeId) +
@@ -252,6 +258,7 @@ contract RideDispute {
             }
             reduceLoserRating(losingParty);
         }
+        emit DisputeResolved(disputeId);
     }
 
     function reduceLoserRating(address loserAddress) internal {

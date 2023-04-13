@@ -4,7 +4,6 @@ const _deploy_contracts = require("../migrations/2_deploy_contracts");
 const truffleAssert = require("truffle-assertions");
 const BigNumber = require("bignumber.js");
 const assert = require("assert");
-const { start } = require("repl");
 
 const RideHailingApp = artifacts.require("RideHailingApp");
 const RideHailingAccountManagement = artifacts.require("RideHailingAccountManagement");
@@ -13,12 +12,6 @@ const RideHailingDriver = artifacts.require("RideHailingDriver");
 const RideHailingDispute = artifacts.require("RideDispute");
 
 const oneEth = new BigNumber(1000000000000000000);
-const MIN_DISPUTE_AMOUNT = 2000000000000000; //compensationDisputed amount + dispute deposit
-const TRANSFER_AMOUNT = 500000000000000; // aka compensationDisputed amount, included in the MIN_DISPUTE_AMOUNT
-const NONCOMPENSATION_AMOUNT = MIN_DISPUTE_AMOUNT - TRANSFER_AMOUNT; //for cases whereby there is no need for compensationDisputed, this amount is purely just for voters
-const VOTER_DEPOSIT_AMOUNT = 100000000000000; //Whenever a voter vote, must deposit this amount
-const MAX_VOTES = 50; //One disputes can only have a max of 50 votes before it automatically closes
-const MIN_VOTES_REQUIRED = 20;
 
 contract("RideHailingDispute", (accounts) => {
   const passengerAccount = accounts[0];
@@ -97,7 +90,7 @@ contract("RideHailingDispute", (accounts) => {
   });
 
   it("Should be able to start a dispute", async () => {
-    await disputeContractInstance.createDispute(
+    const disputeCreated = await disputeContractInstance.createDispute(
       driverAccount,
       "Driver crashed, I want a compensation",
       1, // rideId
@@ -105,6 +98,7 @@ contract("RideHailingDispute", (accounts) => {
       true, // compensationDisputed
       { from: passengerAccount }
     );
+    truffleAssert.eventEmitted(disputeCreated, "DisputeCreated");
     const defendant = await disputeContractInstance.getDefendant(0); // disputeId
     await assert.strictEqual(defendant, driverAccount, "Defendant does not match!");
     const openDisputes = await disputeContractInstance.getOpenDisputes();
@@ -178,8 +172,18 @@ contract("RideHailingDispute", (accounts) => {
     await assert(await disputeContractInstance.isDisputeResponded(1));
   });
 
+  it("Can vote on dispute", async () => {
+    await accountsInstance.createAccount("voter5", {
+      from: accounts[5],
+      value: oneEth.dividedBy(10),
+    });
+    await accountsInstance.rateUser(10, accounts[5], { from: passengerAccount2 });
+    const disputeVoted = await disputeContractInstance.voteDispute(1, 1, { from: accounts[5] });
+    truffleAssert.eventEmitted(disputeVoted, "VoteCasted");
+  });
+
   it("Vote ends with plantiff win", async () => {
-    for (let i = 5; i < 45; i++) {
+    for (let i = 6; i < 45; i++) {
       await accountsInstance.createAccount("voter" + i.toString(), {
         from: accounts[i],
         value: oneEth.dividedBy(10),

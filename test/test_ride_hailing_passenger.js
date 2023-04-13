@@ -83,5 +83,11 @@ contract("RideHailingPassenger", (accounts) => {
   //   );
   // });
 
-  // other test cases
+  it("Passenger can see vehicle info after driver accepts", async () => {});
+
+  it("Passenger can accept driver", async () => {});
+
+  it("Passenger can complete ride", async () => {});
+
+  it("Passenger can rate driver", async () => {});
 });

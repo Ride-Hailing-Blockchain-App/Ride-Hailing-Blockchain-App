@@ -8,6 +8,10 @@ import "../data_storages/RideHailingDisputesDataStorage.sol";
 import "../oracles/RideHailingOracleInterface.sol";
 
 contract RideHailingDriver {
+    event VehicleRegisted(address driver);
+    event RideAcceptedByDriver(uint256 rideId, address driver);
+    event RideCompletedByDriver(uint256 rideId, address driver);
+
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingVehiclesDataStorage private vehiclesDataStorage;
@@ -34,6 +38,7 @@ contract RideHailingDriver {
         string calldata license_number
     ) external payable functionalAccountOnly {
         vehiclesDataStorage.addVehicle(msg.sender, model, color, license_number);
+        emit VehicleRegisted(msg.sender);
     }
 
     function getRideRequestsNearLocation(
@@ -83,6 +88,7 @@ contract RideHailingDriver {
             "You have yet to respond your disputes"
         );
         ridesDataStorage.acceptByDriver(rideId, msg.sender);
+        emit RideAcceptedByDriver(rideId, msg.sender);
     }
 
     // cancelRideRequest in case driver accepts accidentally? but passenger must not have accepted on their end (or do without this first to keep things simple)
@@ -95,6 +101,7 @@ contract RideHailingDriver {
         );
         ridesDataStorage.completeByDriver(rideId, msg.sender);
         accountsDataStorage.transfer(fare, address(accountsDataStorage), msg.sender);
+        emit RideCompletedByDriver(rideId, msg.sender);
     }
 
     function ratePassenger(uint256 rideId, uint256 score) external functionalAccountOnly {

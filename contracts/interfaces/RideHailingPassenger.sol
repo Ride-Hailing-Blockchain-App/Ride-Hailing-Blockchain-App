@@ -7,6 +7,10 @@ import "../data_storages/RideHailingDisputesDataStorage.sol";
 import "../data_storages/RideHailingVehiclesDataStorage.sol";
 
 contract RideHailingPassenger {
+    event RideRequested(uint256 rideId, address passenger);
+    event RideAcceptedByPassenger(uint256 rideId, address passenger);
+    event RideCompletedByPassenger(uint256 rideId, address passenger);
+
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingDisputesDataStorage private rideDisputeDataStorage;
@@ -28,7 +32,7 @@ contract RideHailingPassenger {
         uint256 bidAmount,
         string memory startLocation,
         string memory destination
-    ) external payable functionalAccountOnly returns (uint256) {
+    ) external payable functionalAccountOnly {
         require(
             msg.value + accountsDataStorage.getAccountBalance(msg.sender) >=
                 bidAmount + accountsDataStorage.MIN_DEPOSIT_AMOUNT(),
@@ -51,7 +55,7 @@ contract RideHailingPassenger {
             bidAmount
         );
         accountsDataStorage.addBalance(msg.value, address(accountsDataStorage));
-        return rideId;
+        emit RideRequested(rideId, msg.sender);
     }
 
     function getCurrentRideId() external view functionalAccountOnly returns (uint256) {
@@ -95,10 +99,12 @@ contract RideHailingPassenger {
 
     function acceptDriver(uint256 rideId) external functionalAccountOnly {
         ridesDataStorage.acceptByPassenger(rideId, msg.sender);
+        emit RideAcceptedByPassenger(rideId, msg.sender);
     }
 
     function completeRide(uint256 rideId) external functionalAccountOnly {
         ridesDataStorage.completeByPassenger(rideId, msg.sender);
+        emit RideCompletedByPassenger(rideId, msg.sender);
     }
 
     function rateDriver(uint256 rideId, uint256 score) external functionalAccountOnly {
