@@ -25,7 +25,7 @@ contract("RideHailingDriver", (accounts) => {
     driverContractInstance = await RideHailingDriver.at(driverContractAddress);
   });
 
-  it("should allow driver to register a vehicle successfully", async () => {
+  it("Should allow driver to register a vehicle successfully", async () => {
     await accountsInstance.createAccount("driver", {
       from: driverAccount,
       value: oneEth.dividedBy(10),
@@ -34,14 +34,15 @@ contract("RideHailingDriver", (accounts) => {
     const model = "Car Model";
     const color = "White";
     const license = "ABC123";
-    truffleAssert.passes(
+    truffleAssert.eventEmitted(
       await driverContractInstance.registerVehicle(model, color, license, {
         from: driverAccount,
-      })
+      }),
+      "VehicleRegisted"
     );
   });
 
-  it("should allow driver to accept a ride successfully", async () => {
+  it("Should allow driver to accept a ride successfully", async () => {
     await accountsInstance.createAccount("passenger", {
       from: passengerAccount,
       value: oneEth.dividedBy(10),
@@ -55,14 +56,17 @@ contract("RideHailingDriver", (accounts) => {
       value: web3.utils.toWei("1", "ether"),
     });
 
-    await driverContractInstance.acceptRideRequest(1, {
-      from: driverAccount,
-    });
+    truffleAssert.eventEmitted(
+      await driverContractInstance.acceptRideRequest(1, {
+        from: driverAccount,
+      }),
+      "RideAcceptedByDriver"
+    );
     const driver = await driverContractInstance.getDriver(1);
     await assert.strictEqual(driver, driverAccount, "Driver not set to driverContract");
   });
 
-  it("should not allow driver to accept a ride that is invalid", async () => {
+  it("Should not allow driver to accept a ride that is invalid", async () => {
     await truffleAssert.reverts(
       driverContractInstance.acceptRideRequest(2, {
         from: driverAccount,
@@ -71,7 +75,7 @@ contract("RideHailingDriver", (accounts) => {
     );
   });
 
-  it("should not allow driver to complete a ride that is invalid", async () => {
+  it("Should not allow driver to complete a ride that is invalid", async () => {
     await truffleAssert.reverts(
       driverContractInstance.completeRide(2, {
         from: driverAccount,
@@ -80,7 +84,7 @@ contract("RideHailingDriver", (accounts) => {
     );
   });
 
-  it("should not allow driver to rate a passenger for a ride that is incomplete", async () => {
+  it("Should not allow driver to rate a passenger for a ride that is incomplete", async () => {
     await truffleAssert.reverts(
       driverContractInstance.ratePassenger(1, 5, {
         from: driverAccount,
@@ -89,7 +93,7 @@ contract("RideHailingDriver", (accounts) => {
     );
   });
 
-  it("should allow driver to complete a ride successfully", async () => {
+  it("Should allow driver to complete a ride successfully", async () => {
     const initialBalance = new BigNumber(
       await accountsInstance.getAccountBalance({ from: driverAccount })
     );
@@ -97,21 +101,23 @@ contract("RideHailingDriver", (accounts) => {
     await passengerContractInstance.completeRide(1, {
       from: passengerAccount,
     });
-    await driverContractInstance.completeRide(1, {
-      from: driverAccount,
-    });
-
-    const newBalance = new BigNumber(
-      await accountsInstance.getAccountBalance({ from: driverAccount })
+    truffleAssert.eventEmitted(
+      await driverContractInstance.completeRide(1, {
+        from: driverAccount,
+      }),
+      "RideCompletedByDriver"
     );
 
     const completed = await driverContractInstance.checkIfRideCompleted(1);
+    const newBalance = new BigNumber(
+      await accountsInstance.getAccountBalance({ from: driverAccount })
+    );
     await assert.strictEqual(completed, true, "Ride not completed");
 
     assert(newBalance.isEqualTo(initialBalance.plus(oneEth)));
   });
 
-  it("should not allow driver to rate a passenger with an invalid score", async () => {
+  it("Should not allow driver to rate a passenger with an invalid score", async () => {
     await truffleAssert.reverts(
       driverContractInstance.ratePassenger(1, 11, {
         from: driverAccount,
@@ -120,7 +126,7 @@ contract("RideHailingDriver", (accounts) => {
     );
   });
 
-  it("should allow driver to rate a passenger", async () => {
+  it("Should allow driver to rate a passenger", async () => {
     await driverContractInstance.ratePassenger(1, 5, {
       from: driverAccount,
     });
