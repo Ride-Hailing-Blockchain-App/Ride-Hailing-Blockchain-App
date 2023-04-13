@@ -38,7 +38,8 @@ contract("RideHailingDriver", (accounts) => {
       await driverContractInstance.registerVehicle(model, color, license, {
         from: driverAccount,
       }),
-      "VehicleRegisted"
+      "VehicleRegisted",
+      { driver: driverAccount }
     );
   });
 
