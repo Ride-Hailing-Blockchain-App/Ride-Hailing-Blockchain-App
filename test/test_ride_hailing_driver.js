@@ -34,11 +34,11 @@ contract("RideHailingDriver", (accounts) => {
     const model = "Car Model";
     const color = "White";
     const license = "ABC123";
-    const vehicleId = await driverContractInstance.registerVehicle(model, color, license, {
-      from: driverAccount,
-    });
-
-    await assert.notStrictEqual(vehicleId, undefined, "Failed to register vehicle");
+    truffleAssert.passes(
+      await driverContractInstance.registerVehicle(model, color, license, {
+        from: driverAccount,
+      })
+    );
   });
 
   it("should allow driver to accept a ride successfully", async () => {

@@ -5,20 +5,37 @@ import "./DataStorageBaseContract.sol";
 
 contract RideHailingVehiclesDataStorage is DataStorageBaseContract {
     struct Vehicle {
-        uint256 vehicleId;
+        address driver;
         string model;
         string color;
         string license_number;
     }
-    Vehicle[] private vehicleData;
+    mapping(address => Vehicle) vehicleData;
 
     function addVehicle(
+        address driver,
         string calldata model,
         string calldata color,
         string calldata license_number
-    ) external internalContractsOnly returns (uint256) {
-        uint256 vehicleId = vehicleData.length;
-        vehicleData.push(Vehicle(vehicleId, model, color, license_number));
-        return vehicleId;
+    ) external internalContractsOnly {
+        vehicleData[driver] = Vehicle(driver, model, color, license_number);
+    }
+
+    function getVehicleModel(
+        address driver
+    ) external view internalContractsOnly returns (string memory) {
+        return vehicleData[driver].model;
+    }
+
+    function getVehicleColor(
+        address driver
+    ) external view internalContractsOnly returns (string memory) {
+        return vehicleData[driver].color;
+    }
+
+    function getVehicleLicenseNumber(
+        address driver
+    ) external view internalContractsOnly returns (string memory) {
+        return vehicleData[driver].license_number;
     }
 }

@@ -4,27 +4,31 @@ pragma solidity >=0.4.22 <0.9.0;
 import "../data_storages/RideHailingAccountsDataStorage.sol";
 import "../data_storages/RideHailingRidesDataStorage.sol";
 import "../data_storages/RideHailingDisputesDataStorage.sol";
+import "../data_storages/RideHailingVehiclesDataStorage.sol";
 
 contract RideHailingPassenger {
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingRidesDataStorage private ridesDataStorage;
     RideHailingDisputesDataStorage private rideDisputeDataStorage;
+    RideHailingVehiclesDataStorage private vehiclesDataStorage;
 
     constructor(
         RideHailingAccountsDataStorage accountsDataStorageAddress,
         RideHailingRidesDataStorage ridesDataStorageAddress,
-        RideHailingDisputesDataStorage rideDisputeDataStorageAddress
+        RideHailingDisputesDataStorage rideDisputeDataStorageAddress,
+        RideHailingVehiclesDataStorage vehiclesDataStorageAddress
     ) {
         accountsDataStorage = accountsDataStorageAddress;
         ridesDataStorage = ridesDataStorageAddress;
         rideDisputeDataStorage = rideDisputeDataStorageAddress;
+        vehiclesDataStorage = vehiclesDataStorageAddress;
     }
 
     function requestRide(
         uint256 bidAmount,
         string memory startLocation,
         string memory destination
-    ) external payable functionalAccountOnly {
+    ) external payable functionalAccountOnly returns (uint256) {
         require(
             msg.value + accountsDataStorage.getAccountBalance(msg.sender) >=
                 bidAmount + accountsDataStorage.MIN_DEPOSIT_AMOUNT(),
@@ -40,11 +44,54 @@ contract RideHailingPassenger {
             ridesDataStorage.hasCurrentRide(msg.sender) == false,
             "Passenger cannot request ride as previous ride has not been completed"
         );
-        ridesDataStorage.createRide(msg.sender, startLocation, destination, bidAmount);
+        uint256 rideId = ridesDataStorage.createRide(
+            msg.sender,
+            startLocation,
+            destination,
+            bidAmount
+        );
         accountsDataStorage.addBalance(msg.value, address(accountsDataStorage));
+        return rideId;
     }
 
-    // editRide?
+    function getCurrentRideId() external view functionalAccountOnly returns (uint256) {
+        return ridesDataStorage.getCurrentRideId(msg.sender);
+    }
+
+    function getRideStatus(
+        uint256 rideId
+    ) external view functionalAccountOnly returns (string memory) {
+        require(
+            ridesDataStorage.getPassenger(rideId) == msg.sender,
+            "You are not the passenger for this ride"
+        );
+        if (ridesDataStorage.rideCompleted(rideId)) {
+            return "Ride completed";
+        } else if (ridesDataStorage.inDispute(rideId)) {
+            return "In dispute";
+        } else if (ridesDataStorage.isAcceptedByPassenger(rideId)) {
+            return "Accepted by passenger";
+        } else if (ridesDataStorage.getDriver(rideId) != address(0)) {
+            return "Accepted by driver";
+        } else {
+            return "Looking for driver";
+        }
+    }
+
+    function getVehicleInfo(
+        uint256 rideId
+    ) external view functionalAccountOnly returns (string memory) {
+        require(
+            ridesDataStorage.getPassenger(rideId) == msg.sender,
+            "You are not the passenger for this ride"
+        );
+        address driver = ridesDataStorage.getDriver(rideId);
+        require(driver != address(0), "A driver has not accepted this ride yet");
+        return string.concat(
+            string.concat(vehiclesDataStorage.getVehicleLicenseNumber(driver), ","), 
+            vehiclesDataStorage.getVehicleModel(driver)
+        );
+    }
 
     function acceptDriver(uint256 rideId) external functionalAccountOnly {
         ridesDataStorage.acceptByPassenger(rideId, msg.sender);

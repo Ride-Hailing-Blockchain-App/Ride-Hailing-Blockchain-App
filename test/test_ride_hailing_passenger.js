@@ -11,7 +11,6 @@ const RideHailingPassenger = artifacts.require("RideHailingPassenger");
 const oneEth = new BigNumber(1000000000000000000);
 
 contract("RideHailingPassenger", (accounts) => {
-  let passenger;
   const passengerAccount = accounts[0];
   const driverAccount = accounts[1];
 
@@ -21,6 +20,17 @@ contract("RideHailingPassenger", (accounts) => {
     accountsInstance = await RideHailingAccountManagement.at(accountsContractAddress);
     passengerContractAddress = await appInstance.passengerContract();
     passengerContractInstance = await RideHailingPassenger.at(passengerContractAddress);
+
+    await accountsInstance.createAccount("driver", {
+      from: driverAccount,
+      value: oneEth.dividedBy(10),
+    });
+    const model = "Car Model";
+    const color = "White";
+    const license = "ABC123";
+    await driverContractInstance.registerVehicle(model, color, license, {
+      from: driverAccount,
+    });
   });
 
   it("should allow passenger to request a ride successfully", async () => {
@@ -28,9 +38,6 @@ contract("RideHailingPassenger", (accounts) => {
       from: passengerAccount,
       value: oneEth.dividedBy(10),
     });
-    const initialBalance = new BigNumber(
-      await accountsInstance.getAccountBalance({ from: passengerAccount })
-    );
 
     const bidAmount = web3.utils.toWei("1", "ether");
     const startLocation = "ABC Street";
@@ -39,17 +46,11 @@ contract("RideHailingPassenger", (accounts) => {
       from: passengerAccount,
       value: web3.utils.toWei("1", "ether"),
     });
-    const newBalance = new BigNumber(
-      await accountsInstance.getAccountBalance({ from: passengerAccount })
+    const rideId = new BigNumber(await passengerContractInstance.getCurrentRideId());
+    assert.equal(
+      await passengerContractInstance.getRideStatus(rideId, { from: passengerAccount }),
+      "Looking for driver"
     );
-
-    // assert(
-    //   newBalance.eq(initialBalance.add(web3.utils.toWei("1", "ether"))),
-    //   "Passenger account balance should be increased by 1 ether"
-    // );
-    assert(newBalance.isEqualTo(initialBalance));
-    // const hasRide = await ridesDataStorage.hasCurrentRide(passengerAccount);
-    // assert(hasRide, "Passenger should have an ongoing ride");
   });
 
   // it("should fail to request a ride due to insufficient value sent", async () => {

@@ -42,7 +42,8 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
             0,
             0
         );
-        return rideIdCounter++;
+        passengerRides[passenger] = rideIdCounter++;
+        return rideIdCounter;
     }
 
     function getOpenRideRequests() external view internalContractsOnly returns (Ride[] memory) {
@@ -77,7 +78,6 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
     ) external internalContractsOnly validRideId(rideId) isPassenger(rideId, passenger) {
         require(ridesData[rideId].driver != address(0), "Unable to accept ride without driver");
         ridesData[rideId].acceptedByPassenger = true;
-        passengerRides[passenger] = rideId;
     }
 
     function completeByPassenger(
@@ -131,6 +131,16 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         return ridesData[rideId].passengerRideCompleted && ridesData[rideId].driverRideCompleted;
     }
 
+    function inDispute(uint256 rideId) external view validRideId(rideId) returns (bool) {
+        return ridesData[rideId].inDispute;
+    }
+
+    function isAcceptedByPassenger(
+        uint256 rideId
+    ) external view validRideId(rideId) returns (bool) {
+        return ridesData[rideId].acceptedByPassenger;
+    }
+
     function getRatingForPassenger(
         uint256 rideId
     ) external view validRideId(rideId) returns (uint256) {
@@ -141,6 +151,10 @@ contract RideHailingRidesDataStorage is DataStorageBaseContract {
         uint256 rideId
     ) external view validRideId(rideId) returns (uint256) {
         return ridesData[rideId].ratingForDriver;
+    }
+
+    function getCurrentRideId(address passenger) external view returns (uint256) {
+        return passengerRides[passenger];
     }
 
     function hasCurrentRide(address passenger) external view returns (bool) {
