@@ -4,6 +4,7 @@ const _deploy_contracts = require("../migrations/2_deploy_contracts");
 const truffleAssert = require("truffle-assertions");
 const BigNumber = require("bignumber.js");
 const assert = require("assert");
+const { start } = require("repl");
 
 const RideHailingApp = artifacts.require("RideHailingApp");
 const RideHailingAccountManagement = artifacts.require("RideHailingAccountManagement");
@@ -70,6 +71,28 @@ contract("RideHailingDispute", (accounts) => {
     assert.strictEqual(openDisputes.length, 0);
   });
 
+// todo cannot create dispute for ride not involving plantiff and defendant (DONE)
+  it("Should not be able to start a dispute that the ride does not belong to plantiff and defendant", async() => {
+    await truffleAssert.reverts(disputeContractInstance.createDispute(
+      driverAccount,
+      "Driver crashed, I was a compensation",
+      1,// ride id
+      false,// rideFareDisputed
+      true,// compensationDisputed
+      { from: accounts[5]}
+    ));
+    await truffleAssert.reverts(disputeContractInstance.createDispute(
+      accounts[5],
+      "Driver crashed, I was a compensation",
+      1,// ride id
+      false,// rideFareDisputed
+      true,// compensationDisputed
+      { from: driverAccount}
+    ));
+    const openDisputes = await disputeContractInstance.getOpenDisputes();
+    assert.strictEqual(openDisputes.length, 0);
+  })
+
   it("Should be able to start a dispute", async () => {
     await disputeContractInstance.createDispute(
       driverAccount,
@@ -85,8 +108,6 @@ contract("RideHailingDispute", (accounts) => {
     assert.strictEqual(openDisputes.length, 1);
     assert.strictEqual(openDisputes[0].toNumber(), 0);
   });
-
-  // todo cannot create dispute for ride not involving plantiff and defendant
 
   it("Cannot vote for own dispute", async () => {
     await truffleAssert.reverts(
@@ -106,7 +127,6 @@ contract("RideHailingDispute", (accounts) => {
     );
   });
 
-  // TODO another test for passenger cannot request rides without responding too
   it("Driver cannot accept rides without responding to open disputes to which they are defendant", async () => {
     const bidAmount = web3.utils.toWei("1", "ether");
     const startLocation = "ABC Street";
@@ -198,5 +218,136 @@ contract("RideHailingDispute", (accounts) => {
     );
   });
 
-  // todo test defendant win and indeterminate outcome
+  // TODO another test for passenger cannot request rides without responding too (DONE)
+  it("Passenger cannot request for another ride without responding to open disputes to which they are defendant", async() => {
+    const bidAmount = web3.utils.toWei("1", "ether");
+    const startLocation = "ABC Street";
+    const destination = "XYZ Street";
+    await passengerContractInstance.requestRide(bidAmount, startLocation, destination, {
+      from: passengerAccount,
+      value: web3.utils.toWei("1", "ether"),
+    }); //ride id is 3
+
+    await driverContractInstance.acceptRideRequest(
+      3,
+      { from: driverAccount }
+    );
+
+    await disputeContractInstance.createDispute(
+      passengerAccount,
+      "Passenger is late, I want comepensation",
+      3,
+      false,
+      true,
+      { from: driverAccount }
+    );
+    await truffleAssert.reverts(passengerContractInstance.requestRide(bidAmount, startLocation, destination, {
+      from: passengerAccount,
+      value: web3.utils.toWei("1", "ether"),
+    }),
+    "You have yet to respond your disputes"
+    );
+  });
+
+  it("Passenger can request for new ride after responding to dispute", async() => {
+    const bidAmount = web3.utils.toWei("1", "ether");
+    const startLocation = "ABC Street";
+    const destination = "XYZ Street";
+
+    await disputeContractInstance.challengeDispute(2, "I am not late", {
+      from : passengerAccount
+    });
+
+    await assert(await disputeContractInstance.isDisputeResponded(2));
+
+    await passengerContractInstance.requestRide(bidAmount, startLocation, destination, {
+      from: passengerAccount,
+      value: web3.utils.toWei("1", "ether"),
+    }); //ride id is 4
+  });
+
+  //defendant win
+  it("Vote ends with defendant winning", async() => {
+    let initialBalanceAccount5 = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    for (let i = 5; i < 45; i++) {
+      await disputeContractInstance.voteDispute(2, 2, { from: accounts[i] });
+    };
+    let balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    await assert(
+      balance.isEqualTo(
+        initialBalanceAccount5
+          .minus(new BigNumber(await disputeContractInstance.VOTER_DEPOSIT_AMOUNT()))
+      ),
+      "Voter deposit should be deducted"
+    );
+    initialBalance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[45] }));
+    for (let i = 45; i < 55; i++) {
+      await disputeContractInstance.voteDispute(2, 1, { from: accounts[i] });
+    };
+    balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[45] }));
+    await assert(
+      balance.isEqualTo(
+        initialBalance
+          .minus(new BigNumber(await disputeContractInstance.VOTER_DEPOSIT_AMOUNT()))
+      ),
+      "Losing voter deposit should be deducted"
+    );
+    balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    await assert(
+      balance.isGreaterThan(initialBalanceAccount5),
+      "Winning voter deposit should be returned + winnings"
+    )
+  });
+
+  //Indeterminate outcome
+  it("Dispute has indeterminate outcome", async() => {
+    await driverContractInstance.acceptRideRequest(
+      4,
+      { from: driverAccount }
+    );
+    await disputeContractInstance.createDispute(
+      driverAccount,
+      "Driver is late, I want comepensation",
+      4,
+      false,
+      true,
+      { from: passengerAccount }
+    );
+    await disputeContractInstance.challengeDispute(3, "I am not late", {
+      from : driverAccount
+    });
+    await assert(await disputeContractInstance.isDisputeResponded(3));
+
+    let initialBalanceAccount5 = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    for (let i = 5; i < 30; i++) {
+      await disputeContractInstance.voteDispute(3, 2, { from: accounts[i] });
+    };
+    let balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    await assert(
+      balance.isEqualTo(
+        initialBalanceAccount5
+          .minus(new BigNumber(await disputeContractInstance.VOTER_DEPOSIT_AMOUNT()))
+      ),
+      "Voter deposit should be deducted"
+    );
+    initialBalanceAccount45 = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[45] }));
+    for (let i = 30; i < 55; i++) {
+      await disputeContractInstance.voteDispute(3, 1, { from: accounts[i] });
+    };
+    balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[45] }));
+    await assert(
+      balance.isEqualTo(
+        initialBalanceAccount45
+      ),
+      "Voter deposit should be returned due to indeterminate outcome"
+    );
+    balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
+    await assert(
+      balance.isEqualTo(
+        initialBalanceAccount5
+      ),
+      "Voter deposit should be returned due to indeterminate outcome"
+    );
+  });
+
 });
