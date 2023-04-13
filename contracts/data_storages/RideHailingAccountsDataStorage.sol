@@ -92,4 +92,6 @@ contract RideHailingAccountsDataStorage is DataStorageBaseContract {
         payable(user).transfer(amount);
         accountBalances[user] -= amount;
     }
+
+    receive() external payable {}
 }

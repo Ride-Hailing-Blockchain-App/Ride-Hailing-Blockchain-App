@@ -234,7 +234,7 @@ contract RideHailingDisputesDataStorage is DataStorageBaseContract {
     }
 
     function hasActiveDispute(address user) external view internalContractsOnly returns (bool) {
-        for (uint256 i = 0; i <= disputeData.length; i++) {
+        for (uint256 i = 0; i < disputeData.length; i++) {
             if (
                 (disputeData[i].plaintiff == user || disputeData[i].defendant == user) &&
                 !disputeData[i].resolved

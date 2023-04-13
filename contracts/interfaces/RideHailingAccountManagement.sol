@@ -6,6 +6,7 @@ import "../data_storages/RideHailingDisputesDataStorage.sol";
 
 contract RideHailingAccountManagement {
     event AccountCreated(address userAddress);
+    event FundsWithdrew(uint256 withdrawAmount);
 
     RideHailingAccountsDataStorage private accountsDataStorage;
     RideHailingDisputesDataStorage private disputesDataStorage;
@@ -25,6 +26,7 @@ contract RideHailingAccountManagement {
             "Minimum deposit amount not met"
         );
         accountsDataStorage.createAccount(msg.sender, username, msg.value);
+        payable(address(accountsDataStorage)).transfer(msg.value);
         emit AccountCreated(msg.sender);
     }
 
@@ -36,9 +38,14 @@ contract RideHailingAccountManagement {
     function withdrawFunds(uint256 withdrawAmt) external {
         require(accountsDataStorage.accountIsFunctional(msg.sender), "Minimum deposit not met");
         require(
-            disputesDataStorage.hasActiveDispute(msg.sender),
+            !disputesDataStorage.hasActiveDispute(msg.sender),
             "Passenger cannot withdraw funds due to active dispute"
         );
         accountsDataStorage.withdrawFunds(withdrawAmt, msg.sender);
+        emit FundsWithdrew(withdrawAmt);
+    }
+
+    function getUserRating(address user) external view returns (uint256) {
+        return accountsDataStorage.getOverallRating(user);
     }
 }
