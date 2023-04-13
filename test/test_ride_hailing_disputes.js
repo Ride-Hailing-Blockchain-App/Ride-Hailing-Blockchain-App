@@ -13,6 +13,38 @@ const RideHailingDispute = artifacts.require("RideDispute");
 
 const oneEth = new BigNumber(1000000000000000000);
 
+async function rateUser(userToBeRated, raterUser) {
+  // mimic the interaction between driver and passenger to rate a user
+  await passengerContractInstance.requestRide(
+    web3.utils.toWei("1", "ether"),
+    "ABC Street",
+    "XYZ Street",
+    {
+      from: userToBeRated,
+      value: web3.utils.toWei("1", "ether"),
+    }
+  );
+  const rideId = new BigNumber(
+    await passengerContractInstance.getCurrentRideId({
+      from: userToBeRated,
+    })
+  );
+  await driverContractInstance.acceptRideRequest(rideId, {
+    from: raterUser,
+  });
+
+  await passengerContractInstance.completeRide(rideId, {
+    from: userToBeRated,
+  });
+  await driverContractInstance.completeRide(rideId, {
+    from: raterUser,
+  });
+
+  await driverContractInstance.ratePassenger(rideId, 10, {
+    from: raterUser,
+  });
+}
+
 contract("RideHailingDispute", (accounts) => {
   const passengerAccount = accounts[0];
   const driverAccount = accounts[1];
@@ -177,7 +209,7 @@ contract("RideHailingDispute", (accounts) => {
       from: accounts[5],
       value: oneEth.dividedBy(10),
     });
-    await accountsInstance.rateUser(10, accounts[5], { from: passengerAccount2 });
+    await rateUser(accounts[5], passengerAccount1);
     const disputeVoted = await disputeContractInstance.voteDispute(1, 1, { from: accounts[5] });
     truffleAssert.eventEmitted(disputeVoted, "VoteCasted");
   });
@@ -188,7 +220,7 @@ contract("RideHailingDispute", (accounts) => {
         from: accounts[i],
         value: oneEth.dividedBy(10),
       });
-      await accountsInstance.rateUser(10, accounts[i], { from: passengerAccount2 });
+      await rateUser(accounts[i], passengerAccount1);
       await disputeContractInstance.voteDispute(1, 1, { from: accounts[i] });
     }
     let balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
@@ -206,7 +238,7 @@ contract("RideHailingDispute", (accounts) => {
         from: accounts[i],
         value: oneEth.dividedBy(10),
       });
-      await accountsInstance.rateUser(10, accounts[i], { from: passengerAccount2 });
+      await rateUser(accounts[i], passengerAccount1);
       await disputeContractInstance.voteDispute(1, 2, { from: accounts[i] });
     }
     balance = new BigNumber(await accountsInstance.getAccountBalance({ from: accounts[5] }));
@@ -232,14 +264,19 @@ contract("RideHailingDispute", (accounts) => {
     await passengerContractInstance.requestRide(bidAmount, startLocation, destination, {
       from: passengerAccount,
       value: web3.utils.toWei("1", "ether"),
-    }); //ride id is 3
+    });
+    const rideId = new BigNumber(
+      await passengerContractInstance.getCurrentRideId({
+        from: passengerAccount,
+      })
+    );
 
-    await driverContractInstance.acceptRideRequest(3, { from: driverAccount });
+    await driverContractInstance.acceptRideRequest(rideId, { from: driverAccount });
 
     await disputeContractInstance.createDispute(
       passengerAccount,
       "Passenger is late, I want comepensation",
-      3,
+      rideId,
       false,
       true,
       { from: driverAccount }
@@ -267,7 +304,7 @@ contract("RideHailingDispute", (accounts) => {
     await passengerContractInstance.requestRide(bidAmount, startLocation, destination, {
       from: passengerAccount,
       value: web3.utils.toWei("1", "ether"),
-    }); //ride id is 4
+    });
   });
 
   it("Vote ends with defendant winning", async () => {
@@ -307,11 +344,16 @@ contract("RideHailingDispute", (accounts) => {
   });
 
   it("Dispute has indeterminate outcome", async () => {
-    await driverContractInstance.acceptRideRequest(4, { from: driverAccount });
+    const rideId = new BigNumber(
+      await passengerContractInstance.getCurrentRideId({
+        from: passengerAccount,
+      })
+    );
+    await driverContractInstance.acceptRideRequest(rideId, { from: driverAccount });
     await disputeContractInstance.createDispute(
       driverAccount,
       "Driver is late, I want comepensation",
-      4,
+      rideId,
       false,
       true,
       { from: passengerAccount }

@@ -41,9 +41,4 @@ contract RideHailingAccountManagement {
         );
         accountsDataStorage.withdrawFunds(withdrawAmt, msg.sender);
     }
-
-    //for testing purpose
-    function rateUser(uint256 score, address ratee) external {
-        accountsDataStorage.rateUser(score, ratee);
-    }
 }

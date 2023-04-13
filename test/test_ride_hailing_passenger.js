@@ -46,7 +46,11 @@ contract("RideHailingPassenger", (accounts) => {
       from: passengerAccount,
       value: web3.utils.toWei("1", "ether"),
     });
-    const rideId = new BigNumber(await passengerContractInstance.getCurrentRideId());
+    const rideId = new BigNumber(
+      await passengerContractInstance.getCurrentRideId({
+        from: passengerAccount,
+      })
+    );
     assert.equal(
       await passengerContractInstance.getRideStatus(rideId, { from: passengerAccount }),
       "Looking for driver"
