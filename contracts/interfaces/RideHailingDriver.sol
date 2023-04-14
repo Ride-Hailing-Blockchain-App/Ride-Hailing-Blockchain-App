@@ -8,7 +8,7 @@ import "../data_storages/RideHailingDisputesDataStorage.sol";
 import "../oracles/RideHailingOracleInterface.sol";
 
 contract RideHailingDriver {
-    event VehicleRegisted(address driver);
+    event VehicleRegistered(address driver);
     event RideAcceptedByDriver(uint256 rideId, address driver);
     event RideCompletedByDriver(uint256 rideId, address driver);
 
@@ -38,7 +38,7 @@ contract RideHailingDriver {
         string calldata license_number
     ) external payable functionalAccountOnly {
         vehiclesDataStorage.addVehicle(msg.sender, model, color, license_number);
-        emit VehicleRegisted(msg.sender);
+        emit VehicleRegistered(msg.sender);
     }
 
     function getRideRequestsNearLocation(
