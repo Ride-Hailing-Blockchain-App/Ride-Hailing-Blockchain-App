@@ -91,8 +91,6 @@ contract RideHailingDriver {
         emit RideAcceptedByDriver(rideId, msg.sender);
     }
 
-    // cancelRideRequest in case driver accepts accidentally? but passenger must not have accepted on their end (or do without this first to keep things simple)
-
     function completeRide(uint256 rideId) external functionalAccountOnly {
         uint256 fare = ridesDataStorage.getFare(rideId);
         require(
